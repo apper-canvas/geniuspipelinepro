@@ -439,9 +439,21 @@ const MainFeature = ({ activeSection }) => {
             </motion.div>
           )}
 
-          {(activeSection === 'activities' || activeSection === 'emails') && (
+{activeSection === 'activities' && (
             <motion.div
-              key={activeSection}
+              key="activities"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="h-full"
+            >
+              <ActivityTimeline />
+            </motion.div>
+          )}
+
+          {activeSection === 'emails' && (
+            <motion.div
+              key="emails"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
@@ -449,16 +461,13 @@ const MainFeature = ({ activeSection }) => {
             >
               <div className="text-center">
                 <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full flex items-center justify-center">
-                  <ApperIcon name={activeSection === 'activities' ? 'Activity' : 'Mail'} className="w-12 h-12 text-primary" />
+                  <ApperIcon name="Mail" className="w-12 h-12 text-primary" />
                 </div>
                 <h3 className="text-xl font-semibold text-surface-900 dark:text-white mb-2">
-                  {activeSection === 'activities' ? 'Activities' : 'Email Management'}
+                  Email Management
                 </h3>
                 <p className="text-surface-600 dark:text-surface-400">
-                  {activeSection === 'activities' 
-                    ? 'Track all customer interactions and engagement history'
-                    : 'Manage email communications and correspondence'
-                  }
+                  Manage email communications and correspondence
                 </p>
               </div>
             </motion.div>
