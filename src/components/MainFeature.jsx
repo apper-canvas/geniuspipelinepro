@@ -1252,9 +1252,24 @@ onClick={() => {
                             <span className="text-surface-600 dark:text-surface-400">
                               {deal?.probability || 0}% chance
                             </span>
-                            <span className="text-surface-500">
+<span className="text-surface-500">
                               {deal?.expectedCloseDate ? format(new Date(deal.expectedCloseDate), 'MMM dd') : 'No date'}
                             </span>
+                          </div>
+                          <div className="mt-3 pt-3 border-t border-surface-200 dark:border-surface-600">
+                            <motion.button
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setSelectedEntity({ type: 'deal', data: deal })
+                                setShowNotesModal(true)
+                              }}
+                              className="w-full flex items-center justify-center space-x-2 px-3 py-2 bg-surface-100 dark:bg-surface-600 text-surface-700 dark:text-surface-300 rounded-lg hover:bg-surface-200 dark:hover:bg-surface-500 transition-colors"
+                            >
+                              <ApperIcon name="MessageSquare" className="w-4 h-4" />
+                              <span className="text-sm">Notes</span>
+                            </motion.button>
                           </div>
                         </motion.div>
                       )) || []}
