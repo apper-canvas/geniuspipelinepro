@@ -40,6 +40,8 @@ const [searchTerm, setSearchTerm] = useState('')
 const [showNotesModal, setShowNotesModal] = useState(false)
   const [selectedEntity, setSelectedEntity] = useState(null)
   const [notes, setNotes] = useState([])
+  const [showTaskDetailModal, setShowTaskDetailModal] = useState(false)
+  const [selectedTaskDetail, setSelectedTaskDetail] = useState(null)
   const [teamMembers] = useState([
     { id: 1, name: 'John Smith', username: 'john.smith', email: 'john.smith@company.com', role: 'Sales Manager' },
     { id: 2, name: 'Jane Doe', username: 'jane.doe', email: 'jane.doe@company.com', role: 'Account Executive' },
@@ -1323,7 +1325,7 @@ onClick={() => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               className="h-full"
-            >
+>
               <div className="grid gap-6">
                 <div className="bg-white/80 dark:bg-surface-800/80 backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-700 p-6">
                   <div className="space-y-4">
@@ -1334,7 +1336,11 @@ onClick={() => {
                           key={task.id}
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
-                          className="flex items-start space-x-4 p-4 border border-surface-200 dark:border-surface-600 rounded-xl hover:bg-surface-50 dark:hover:bg-surface-700/50 transition-colors"
+                          className="flex items-start space-x-4 p-4 border border-surface-200 dark:border-surface-600 rounded-xl hover:bg-surface-50 dark:hover:bg-surface-700/50 transition-colors cursor-pointer"
+                          onClick={() => {
+                            setSelectedTaskDetail(task)
+                            setShowTaskDetailModal(true)
+                          }}
                         >
                           <div className={`w-8 h-8 rounded-lg ${priority.color} flex items-center justify-center`}>
                             <ApperIcon name={priority.icon} className="w-4 h-4" />
@@ -1362,7 +1368,10 @@ onClick={() => {
                             <motion.button
                               whileHover={{ scale: 1.1 }}
                               whileTap={{ scale: 0.9 }}
-                              onClick={() => handleTaskEdit(task)}
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleTaskEdit(task)
+                              }}
                               className="p-2 text-surface-400 hover:text-primary rounded-lg hover:bg-surface-100 dark:hover:bg-surface-600 transition-colors"
                             >
                               <ApperIcon name="Edit" className="w-4 h-4" />
@@ -1370,7 +1379,10 @@ onClick={() => {
                             <motion.button
                               whileHover={{ scale: 1.1 }}
                               whileTap={{ scale: 0.9 }}
-                              onClick={() => handleTaskDelete(task.id)}
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleTaskDelete(task.id)
+                              }}
                               className="p-2 text-surface-400 hover:text-red-500 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-600 transition-colors"
                             >
                               <ApperIcon name="Trash2" className="w-4 h-4" />
@@ -2603,6 +2615,190 @@ onClick={() => {
                   >
                     <ApperIcon name="Edit" className="w-4 h-4" />
                     <span>Edit Company</span>
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+</motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Task Detail Modal */}
+      <AnimatePresence>
+        {showTaskDetailModal && selectedTaskDetail && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+            onClick={() => setShowTaskDetailModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white dark:bg-surface-800 rounded-2xl border border-surface-200 dark:border-surface-700 p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-semibold text-surface-900 dark:text-white">
+                  Task Details
+                </h3>
+                <button
+                  onClick={() => setShowTaskDetailModal(false)}
+                  className="p-2 hover:bg-surface-100 dark:hover:bg-surface-700 rounded-lg transition-colors"
+                >
+                  <ApperIcon name="X" className="w-5 h-5 text-surface-500" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* Task Header */}
+                <div className="flex items-start space-x-4 p-4 bg-surface-50 dark:bg-surface-700/50 rounded-xl">
+                  {(() => {
+                    const priority = getTaskPriority(selectedTaskDetail?.priority)
+                    return (
+                      <div className={`w-12 h-12 rounded-lg ${priority.color} flex items-center justify-center`}>
+                        <ApperIcon name={priority.icon} className="w-6 h-6" />
+                      </div>
+                    )
+                  })()}
+                  <div className="flex-1">
+                    <h4 className="text-xl font-semibold text-surface-900 dark:text-white">
+                      {selectedTaskDetail?.title || 'Untitled Task'}
+                    </h4>
+                    <p className="text-surface-600 dark:text-surface-400 mt-1">
+                      {selectedTaskDetail?.description || 'No description provided'}
+                    </p>
+                    <div className="flex items-center space-x-3 mt-2">
+                      <span className={`px-2 py-1 rounded-lg text-xs font-medium ${
+                        selectedTaskDetail?.status === 'completed' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
+                        selectedTaskDetail?.status === 'in-progress' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' :
+                        'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300'
+                      }`}>
+                        {selectedTaskDetail?.status || 'pending'}
+                      </span>
+                      <span className={`px-2 py-1 rounded-lg text-xs font-medium ${
+                        selectedTaskDetail?.priority === 'high' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' :
+                        selectedTaskDetail?.priority === 'medium' ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300' :
+                        'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                      }`}>
+                        {selectedTaskDetail?.priority || 'medium'} priority
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Task Information */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <h5 className="text-lg font-semibold text-surface-900 dark:text-white">Task Information</h5>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Calendar" className="w-4 h-4 text-primary" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Due Date</p>
+                          <p className="text-surface-900 dark:text-white">
+                            {selectedTaskDetail?.dueDate ? format(new Date(selectedTaskDetail.dueDate), 'PPP') : 'No due date'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-secondary/10 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="User" className="w-4 h-4 text-secondary" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Assigned To</p>
+                          <p className="text-surface-900 dark:text-white">{selectedTaskDetail?.assignedTo || 'Unassigned'}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Clock" className="w-4 h-4 text-accent" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Status</p>
+                          <p className="text-surface-900 dark:text-white capitalize">
+                            {getTaskStatus(selectedTaskDetail?.dueDate)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h5 className="text-lg font-semibold text-surface-900 dark:text-white">Additional Details</h5>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Plus" className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Created</p>
+                          <p className="text-surface-900 dark:text-white">
+                            {selectedTaskDetail?.createdAt ? format(new Date(selectedTaskDetail.createdAt), 'PPP') : 'Unknown'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Edit" className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Last Updated</p>
+                          <p className="text-surface-900 dark:text-white">
+                            {selectedTaskDetail?.updatedAt ? format(new Date(selectedTaskDetail.updatedAt), 'PPP') : 'Never'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Target" className="w-4 h-4 text-green-600 dark:text-green-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Priority Level</p>
+                          <p className="text-surface-900 dark:text-white capitalize">
+                            {selectedTaskDetail?.priority || 'medium'} priority
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex justify-end space-x-3 pt-6 border-t border-surface-200 dark:border-surface-700">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      setShowTaskDetailModal(false)
+                      handleTaskEdit(selectedTaskDetail)
+                    }}
+                    className="px-6 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg hover:shadow-lg transition-all duration-300 flex items-center space-x-2"
+                  >
+                    <ApperIcon name="Edit" className="w-4 h-4" />
+                    <span>Edit Task</span>
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      setShowTaskDetailModal(false)
+                      handleTaskDelete(selectedTaskDetail.id)
+                    }}
+                    className="px-6 py-2 border border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors flex items-center space-x-2"
+                  >
+                    <ApperIcon name="Trash2" className="w-4 h-4" />
+                    <span>Delete Task</span>
                   </motion.button>
                 </div>
               </div>
