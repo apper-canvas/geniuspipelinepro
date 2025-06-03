@@ -949,7 +949,24 @@ if (loading) {
             </p>
           </div>
           
-{activeSection === 'tasks' && (
+          {activeSection === 'pipeline' && (
+            <div className="flex justify-end">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  // TODO: Implement deal creation modal
+                  console.log('Add new deal clicked')
+                }}
+                className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-2 rounded-xl font-medium hover:shadow-lg transition-all duration-300 flex items-center space-x-2"
+              >
+                <ApperIcon name="Plus" className="w-4 h-4" />
+                <span>New Deal</span>
+              </motion.button>
+            </div>
+          )}
+          
+          {activeSection === 'tasks' && (
             <div className="flex justify-end">
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -973,7 +990,6 @@ if (loading) {
               </motion.button>
             </div>
           )}
-          
           {activeSection === 'contacts' && (
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="relative">
