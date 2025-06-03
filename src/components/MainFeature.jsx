@@ -77,13 +77,9 @@ const [taskFormData, setTaskFormData] = useState({
     status: 'pending',
     dueDate: '',
     assignedTo: ''
-  })
+})
 
   const [emailFormData, setEmailFormData] = useState({
-    to: '',
-    subject: '',
-    body: '',
-const [emailFormData, setEmailFormData] = useState({
     to: '',
     subject: '',
     body: '',
@@ -97,13 +93,16 @@ const [emailFormData, setEmailFormData] = useState({
     stage: 'lead',
     probability: 50,
     expectedCloseDate: ''
-  })
+})
 
   const pipelineStages = [
     { id: 'lead', label: 'Lead', color: 'bg-gray-400' },
     { id: 'qualified', label: 'Qualified', color: 'bg-blue-400' },
     { id: 'proposal', label: 'Proposal', color: 'bg-yellow-400' },
-
+    { id: 'negotiation', label: 'Negotiation', color: 'bg-orange-400' },
+    { id: 'closed-won', label: 'Closed Won', color: 'bg-green-400' },
+    { id: 'closed-lost', label: 'Closed Lost', color: 'bg-red-400' }
+  ]
   const loadContacts = async () => {
     try {
       setLoading(true)
@@ -436,9 +435,8 @@ const handleAddContact = async (contactData) => {
       email: contact.email || '',
       phone: contact.phone || '',
       company: contact.company || '',
-      position: contact.position || ''
-    })
-setShowModal(true)
+})
+    setShowModal(true)
   }
 
   const handleDelete = async (contactId) => {
@@ -489,11 +487,9 @@ setShowModal(true)
       } catch (err) {
         toast.error('Failed to update deal')
       }
-    }
+}
     setDraggedDeal(null)
-setDraggedDeal(null)
   }
-
   const handleDealSubmit = async (e) => {
     e.preventDefault()
     if (!dealFormData.title?.trim() || !dealFormData.value) {
