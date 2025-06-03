@@ -6,7 +6,8 @@ import ApperIcon from '../components/ApperIcon'
 const Home = ({ darkMode, toggleDarkMode }) => {
   const [activeSection, setActiveSection] = useState('contacts')
 
-  const navigation = [
+const navigation = [
+    { id: 'dashboard', label: 'Dashboard', icon: 'BarChart3' },
     { id: 'contacts', label: 'Contacts', icon: 'Users' },
     { id: 'pipeline', label: 'Pipeline', icon: 'TrendingUp' },
     { id: 'tasks', label: 'Tasks', icon: 'CheckSquare' },
