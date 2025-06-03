@@ -73,8 +73,15 @@ const [draggedDeal, setDraggedDeal] = useState(null)
       loadTasks()
     } else if (activeSection === 'emails') {
       loadEmails()
-    }
+}
   }, [activeSection])
+
+  // Auto-show company details modal when company is selected
+  useEffect(() => {
+    if (selectedCompanyDetail && !showCompanyDetailModal) {
+      setShowCompanyDetailModal(true)
+    }
+  }, [selectedCompanyDetail, showCompanyDetailModal])
 
   const loadCompanies = async () => {
     try {
