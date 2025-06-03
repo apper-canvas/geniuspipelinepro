@@ -62,22 +62,29 @@ const [draggedDeal, setDraggedDeal] = useState(null)
     company: '',
     position: ''
   })
-  useEffect(() => {
+useEffect(() => {
     if (activeSection === 'contacts') {
       loadContacts()
     } else if (activeSection === 'companies') {
       loadCompanies()
     } else if (activeSection === 'pipeline') {
       loadDeals()
-} else if (activeSection === 'tasks') {
+    } else if (activeSection === 'tasks') {
       loadTasks()
     } else if (activeSection === 'emails') {
       loadEmails()
-}
+    }
+  }, [activeSection])
+  // Clear company details when switching away from companies section
+  useEffect(() => {
+    if (activeSection !== 'companies') {
+      setSelectedCompanyDetail(null)
+      setShowCompanyDetailModal(false)
+    }
   }, [activeSection])
 
   // Auto-show company details modal when company is selected
-  useEffect(() => {
+useEffect(() => {
     if (selectedCompanyDetail && !showCompanyDetailModal) {
       setShowCompanyDetailModal(true)
     }
@@ -3034,10 +3041,9 @@ const TaggingInput = ({ teamMembers, onSubmit }) => {
   const [content, setContent] = useState('')
   const [showSuggestions, setShowSuggestions] = useState(false)
   const [suggestions, setSuggestions] = useState([])
-  const [selectedSuggestion, setSelectedSuggestion] = useState(0)
+const [selectedSuggestion, setSelectedSuggestion] = useState(0)
   const [mentionStart, setMentionStart] = useState(0)
   const textareaRef = React.useRef(null)
-
   const handleContentChange = (e) => {
     const value = e.target.value
     const cursorPosition = e.target.selectionStart
