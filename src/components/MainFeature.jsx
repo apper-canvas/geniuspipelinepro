@@ -1,41 +1,41 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { toast } from 'react-toastify'
+import { format, isPast, isToday, isTomorrow } from 'date-fns'
 import ApperIcon from './ApperIcon'
 import ActivityTimeline from './ActivityTimeline'
-import { contactService } from '../services'
-import { dealService } from '../services'
-import { taskService } from '../services'
-import { emailService } from '../services'
-import { format, isToday, isTomorrow, isPast } from 'date-fns'
+import { contactService, dealService, taskService, activityService, emailService } from '../services'
+import companyService from '../services/api/companyService'
+import { toast } from 'react-toastify'
+import Dashboard from './Dashboard'
 
 const MainFeature = ({ activeSection }) => {
-const [contacts, setContacts] = useState([])
-  const [deals, setDeals] = useState([])
+  const [contacts, setContacts] = useState([])
+  const [companies, setCompanies] = useState([])
+const [deals, setDeals] = useState([])
   const [tasks, setTasks] = useState([])
   const [emails, setEmails] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
-  const [showModal, setShowModal] = useState(false)
-  const [selectedContact, setSelectedContact] = useState(null)
+  const [showContactModal, setShowContactModal] = useState(false)
+  const [showCompanyModal, setShowCompanyModal] = useState(false)
   const [showTaskModal, setShowTaskModal] = useState(false)
+  const [showModal, setShowModal] = useState(false)
+  const [editingContact, setEditingContact] = useState(null)
+  const [editingCompany, setEditingCompany] = useState(null)
+  const [editingTask, setEditingTask] = useState(null)
+  const [selectedContact, setSelectedContact] = useState(null)
   const [selectedTask, setSelectedTask] = useState(null)
-  const [showEmailCompose, setShowEmailCompose] = useState(false)
   const [selectedEmail, setSelectedEmail] = useState(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedFilter, setSelectedFilter] = useState('all')
+  const [showEmailCompose, setShowEmailCompose] = useState(false)
+  const [replyingTo, setReplyingTo] = useState(null)
+  const [emailContent, setEmailContent] = useState({ to: '', subject: '', body: '' })
   const [emailSearchTerm, setEmailSearchTerm] = useState('')
   const [emailFilter, setEmailFilter] = useState('all')
-  const [searchTerm, setSearchTerm] = useState('')
   const [draggedDeal, setDraggedDeal] = useState(null)
-  const pipelineStages = [
-    { id: 'lead', label: 'Lead', color: 'bg-surface-500' },
-    { id: 'qualified', label: 'Qualified', color: 'bg-blue-500' },
-    { id: 'proposal', label: 'Proposal', color: 'bg-accent' },
-    { id: 'negotiation', label: 'Negotiation', color: 'bg-orange-500' },
-    { id: 'closed-won', label: 'Closed Won', color: 'bg-green-500' },
-    { id: 'closed-lost', label: 'Closed Lost', color: 'bg-red-500' }
-  ]
 
-const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
@@ -43,15 +43,40 @@ const [formData, setFormData] = useState({
     company: '',
     position: ''
   })
+  useEffect(() => {
+    if (activeSection === 'contacts') {
+      loadContacts()
+    } else if (activeSection === 'companies') {
+      loadCompanies()
+    } else if (activeSection === 'pipeline') {
+      loadDeals()
+} else if (activeSection === 'tasks') {
+      loadTasks()
+    } else if (activeSection === 'emails') {
+      loadEmails()
+    }
+  }, [activeSection])
 
-  const [taskFormData, setTaskFormData] = useState({
+  const loadCompanies = async () => {
+    try {
+      setLoading(true)
+      const data = await companyService.getAll()
+      setCompanies(data)
+    } catch (error) {
+      console.error('Error loading companies:', error)
+      toast.error('Failed to load companies')
+    } finally {
+      setLoading(false)
+    }
+  }
+const [taskFormData, setTaskFormData] = useState({
     title: '',
     description: '',
     priority: 'medium',
     status: 'pending',
     dueDate: '',
     assignedTo: ''
-})
+  })
 
   const [emailFormData, setEmailFormData] = useState({
     to: '',
@@ -59,6 +84,68 @@ const [formData, setFormData] = useState({
     body: '',
     replyTo: null
   })
+
+  const pipelineStages = [
+    { id: 'lead', label: 'Lead', color: 'bg-gray-400' },
+    { id: 'qualified', label: 'Qualified', color: 'bg-blue-400' },
+    { id: 'proposal', label: 'Proposal', color: 'bg-yellow-400' },
+    { id: 'negotiation', label: 'Negotiation', color: 'bg-orange-400' },
+    { id: 'closed-won', label: 'Closed Won', color: 'bg-green-400' },
+    { id: 'closed-lost', label: 'Closed Lost', color: 'bg-red-400' }
+  ]
+
+  const loadContacts = async () => {
+    try {
+      setLoading(true)
+      const data = await contactService.getAll()
+      setContacts(data)
+    } catch (error) {
+      console.error('Error loading contacts:', error)
+      toast.error('Failed to load contacts')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const loadDeals = async () => {
+    try {
+      setLoading(true)
+      const data = await dealService.getAll()
+      setDeals(data)
+    } catch (error) {
+      console.error('Error loading deals:', error)
+      toast.error('Failed to load deals')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const loadTasks = async () => {
+    try {
+      setLoading(true)
+      const data = await taskService.getAll()
+      setTasks(data)
+    } catch (error) {
+      console.error('Error loading tasks:', error)
+      toast.error('Failed to load tasks')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const loadEmails = async () => {
+    try {
+      setLoading(true)
+      const data = await emailService.getAll()
+      setEmails(data)
+    } catch (error) {
+      console.error('Error loading emails:', error)
+      toast.error('Failed to load emails')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
     loadData()
   }, [activeSection])
@@ -121,6 +208,81 @@ const loadData = async () => {
     }
 }
 
+  const handleEditContact = async (contactData) => {
+    try {
+      const updatedContact = await contactService.update(editingContact.id, contactData)
+      setContacts(contacts.map(c => c.id === editingContact.id ? updatedContact : c))
+      setEditingContact(null)
+      setShowContactModal(false)
+      toast.success('Contact updated successfully!')
+    } catch (error) {
+      console.error('Error updating contact:', error)
+      toast.error('Failed to update contact')
+    }
+  }
+
+  const handleDeleteContact = async (contactId) => {
+    if (window.confirm('Are you sure you want to delete this contact?')) {
+      try {
+        await contactService.delete(contactId)
+        setContacts(contacts.filter(c => c.id !== contactId))
+        toast.success('Contact deleted successfully!')
+      } catch (error) {
+        console.error('Error deleting contact:', error)
+        toast.error('Failed to delete contact')
+      }
+    }
+  }
+  const handleAddCompany = async (companyData) => {
+    try {
+      const newCompany = await companyService.create(companyData)
+      setCompanies([...companies, newCompany])
+      setShowCompanyModal(false)
+      toast.success('Company added successfully!')
+    } catch (error) {
+      console.error('Error adding company:', error)
+      toast.error('Failed to add company')
+    }
+  }
+
+  const handleEditCompany = async (companyData) => {
+    try {
+      const updatedCompany = await companyService.update(editingCompany.id, companyData)
+      setCompanies(companies.map(c => c.id === editingCompany.id ? updatedCompany : c))
+      setEditingCompany(null)
+      setShowCompanyModal(false)
+      toast.success('Company updated successfully!')
+    } catch (error) {
+      console.error('Error updating company:', error)
+      toast.error('Failed to update company')
+    }
+  }
+
+  const handleDeleteCompany = async (companyId) => {
+    if (window.confirm('Are you sure you want to delete this company?')) {
+      try {
+        await companyService.delete(companyId)
+        setCompanies(companies.filter(c => c.id !== companyId))
+        toast.success('Company deleted successfully!')
+      } catch (error) {
+        console.error('Error deleting company:', error)
+        toast.error('Failed to delete company')
+      }
+    }
+  }
+
+const handleAddContact = async (contactData) => {
+    try {
+      const newContact = await contactService.create(contactData)
+      setContacts([...contacts, newContact])
+      setShowContactModal(false)
+      toast.success('Contact added successfully!')
+    } catch (error) {
+      console.error('Error adding contact:', error)
+      toast.error('Failed to add contact')
+    }
+  }
+
   const handleTaskSubmit = async (e) => {
     e.preventDefault()
     if (!taskFormData.title?.trim()) {
@@ -153,7 +315,7 @@ const loadData = async () => {
     } finally {
       setLoading(false)
     }
-}
+  }
 
   const handleEmailSubmit = async (e) => {
     e.preventDefault()
@@ -266,20 +428,36 @@ const loadData = async () => {
       company: contact.company || '',
       position: contact.position || ''
     })
-    setShowModal(true)
+setShowModal(true)
   }
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (contactId) => {
     if (!window.confirm('Are you sure you want to delete this contact?')) return
     
     try {
-      await contactService.delete(id)
+      await contactService.delete(contactId)
       toast.success('Contact deleted successfully')
       loadData()
     } catch (err) {
       toast.error(err?.message || 'Failed to delete contact')
     }
   }
+
+  const filteredContacts = contacts.filter(contact => {
+    const matchesSearch = `${contact.firstName} ${contact.lastName} ${contact.email} ${contact.company}`.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesFilter = selectedFilter === 'all' || contact.tags?.includes(selectedFilter)
+    return matchesSearch && matchesFilter
+  })
+
+  const filteredCompanies = companies.filter(company => {
+    const matchesSearch = `${company.name} ${company.industry} ${company.size}`.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesFilter = selectedFilter === 'all' || 
+      (selectedFilter === 'small' && company.size === 'Small') ||
+      (selectedFilter === 'medium' && company.size === 'Medium') ||
+      (selectedFilter === 'large' && company.size === 'Large') ||
+      (selectedFilter === 'enterprise' && company.size === 'Enterprise')
+    return matchesSearch && matchesFilter
+  })
 
   const handleDragStart = (e, deal) => {
     setDraggedDeal(deal)
@@ -305,13 +483,7 @@ const loadData = async () => {
     setDraggedDeal(null)
   }
 
-  const filteredContacts = contacts?.filter(contact =>
-    `${contact?.firstName || ''} ${contact?.lastName || ''} ${contact?.email || ''} ${contact?.company || ''}`
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase())
-  ) || []
-
-  const getTaskPriority = (priority) => {
+const getTaskPriority = (priority) => {
     switch (priority) {
       case 'high': return { color: 'text-red-600 bg-red-100', icon: 'AlertTriangle' }
       case 'medium': return { color: 'text-amber-600 bg-amber-100', icon: 'Clock' }
@@ -327,7 +499,7 @@ const loadData = async () => {
     if (isToday(date)) return 'Due today'
     if (isTomorrow(date)) return 'Due tomorrow'
     return format(date, 'MMM dd, yyyy')
-}
+  }
 
   const filteredEmails = emails?.filter(email => {
     const matchesSearch = !emailSearchTerm || 
@@ -342,7 +514,398 @@ const loadData = async () => {
     return matchesSearch && matchesFilter
   }) || []
 
-  if (loading) {
+  if (activeSection === 'dashboard') {
+    return <Dashboard />
+  }
+    if (activeSection === 'companies') {
+      return (
+        <div className="p-6">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+            <div>
+              <h1 className="text-3xl font-bold text-surface-900 dark:text-white">Companies</h1>
+              <p className="text-surface-600 dark:text-surface-400 mt-1">Manage your company relationships</p>
+            </div>
+            <motion.button
+              onClick={() => {
+                setEditingCompany(null)
+                setShowCompanyModal(true)
+              }}
+              className="mt-4 sm:mt-0 flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-xl hover:shadow-lg transition-all"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <ApperIcon name="Plus" className="w-4 h-4" />
+              <span>New Company</span>
+            </motion.button>
+          </div>
+
+          {/* Search and Filters */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="flex-1 relative">
+              <ApperIcon name="Search" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-surface-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Search companies..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+            </div>
+            <select
+              value={selectedFilter}
+              onChange={(e) => setSelectedFilter(e.target.value)}
+              className="px-4 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+            >
+              <option value="all">All Sizes</option>
+              <option value="small">Small</option>
+              <option value="medium">Medium</option>
+              <option value="large">Large</option>
+              <option value="enterprise">Enterprise</option>
+            </select>
+          </div>
+
+          {/* Companies Grid */}
+          {loading ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredCompanies.map((company) => (
+                <motion.div
+                  key={company.id}
+                  className="bg-white dark:bg-surface-800 p-6 rounded-2xl shadow-card border border-surface-200 dark:border-surface-700"
+                  whileHover={{ scale: 1.02 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-surface-900 dark:text-white">{company.name}</h3>
+                      <p className="text-surface-600 dark:text-surface-400 text-sm">{company.industry}</p>
+                    </div>
+                    <span className={`px-2 py-1 rounded-lg text-xs font-medium ${
+                      company.size === 'Small' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' :
+                      company.size === 'Medium' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
+                      company.size === 'Large' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300' :
+                      'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
+                    }`}>
+                      {company.size}
+                    </span>
+                  </div>
+                  
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center space-x-2 text-sm text-surface-600 dark:text-surface-400">
+                      <ApperIcon name="Users" className="w-4 h-4" />
+                      <span>{company.employees} employees</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm text-surface-600 dark:text-surface-400">
+                      <ApperIcon name="Globe" className="w-4 h-4" />
+                      <span className="truncate">{company.website}</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm text-surface-600 dark:text-surface-400">
+                      <ApperIcon name="MapPin" className="w-4 h-4" />
+                      <span>{company.address.city}, {company.address.state}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => {
+                        setEditingCompany(company)
+                        setShowCompanyModal(true)
+                      }}
+                      className="flex-1 flex items-center justify-center space-x-1 px-3 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
+                    >
+                      <ApperIcon name="Edit" className="w-4 h-4" />
+                      <span className="text-sm">Edit</span>
+                    </button>
+                    <button
+                      onClick={() => handleDeleteCompany(company.id)}
+                      className="flex-1 flex items-center justify-center space-x-1 px-3 py-2 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
+                    >
+                      <ApperIcon name="Trash2" className="w-4 h-4" />
+                      <span className="text-sm">Delete</span>
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+
+          {/* Company Modal */}
+          {showCompanyModal && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+              <motion.div
+                className="bg-white dark:bg-surface-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-surface-900 dark:text-white">
+                    {editingCompany ? 'Edit Company' : 'Add New Company'}
+                  </h2>
+                  <button
+                    onClick={() => {
+                      setShowCompanyModal(false)
+                      setEditingCompany(null)
+                    }}
+                    className="p-2 hover:bg-surface-100 dark:hover:bg-surface-700 rounded-xl transition-colors"
+                  >
+                    <ApperIcon name="X" className="w-5 h-5 text-surface-500" />
+                  </button>
+                </div>
+
+                <form onSubmit={(e) => {
+                  e.preventDefault()
+                  const formData = new FormData(e.target)
+                  const companyData = {
+                    name: formData.get('name'),
+                    industry: formData.get('industry'),
+                    size: formData.get('size'),
+                    employees: parseInt(formData.get('employees')),
+                    website: formData.get('website'),
+                    phone: formData.get('phone'),
+                    email: formData.get('email'),
+                    address: {
+                      street: formData.get('street'),
+                      city: formData.get('city'),
+                      state: formData.get('state'),
+                      zipCode: formData.get('zipCode'),
+                      country: formData.get('country')
+                    },
+                    description: formData.get('description'),
+                    founded: formData.get('founded'),
+                    revenue: formData.get('revenue')
+                  }
+                  
+                  if (editingCompany) {
+                    handleEditCompany(companyData)
+                  } else {
+                    handleAddCompany(companyData)
+                  }
+                }} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                        Company Name *
+                      </label>
+                      <input
+                        type="text"
+                        name="name"
+                        defaultValue={editingCompany?.name}
+                        required
+                        className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                        Industry *
+                      </label>
+                      <input
+                        type="text"
+                        name="industry"
+                        defaultValue={editingCompany?.industry}
+                        required
+                        className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                        Company Size *
+                      </label>
+                      <select
+                        name="size"
+                        defaultValue={editingCompany?.size}
+                        required
+                        className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      >
+                        <option value="">Select size</option>
+                        <option value="Small">Small (1-50)</option>
+                        <option value="Medium">Medium (51-250)</option>
+                        <option value="Large">Large (251-1000)</option>
+                        <option value="Enterprise">Enterprise (1000+)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                        Employees
+                      </label>
+                      <input
+                        type="number"
+                        name="employees"
+                        defaultValue={editingCompany?.employees}
+                        className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                        Website
+                      </label>
+                      <input
+                        type="url"
+                        name="website"
+                        defaultValue={editingCompany?.website}
+                        className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                        Phone
+                      </label>
+                      <input
+                        type="tel"
+                        name="phone"
+                        defaultValue={editingCompany?.phone}
+                        className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                        Email
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        defaultValue={editingCompany?.email}
+                        className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                        Founded
+                      </label>
+                      <input
+                        type="text"
+                        name="founded"
+                        defaultValue={editingCompany?.founded}
+                        className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                      Revenue Range
+                    </label>
+                    <select
+                      name="revenue"
+                      defaultValue={editingCompany?.revenue}
+                      className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    >
+                      <option value="">Select revenue range</option>
+                      <option value="<$1M">Less than $1M</option>
+                      <option value="$1M - $10M">$1M - $10M</option>
+                      <option value="$10M - $50M">$10M - $50M</option>
+                      <option value="$50M - $100M">$50M - $100M</option>
+                      <option value="$100M - $500M">$100M - $500M</option>
+                      <option value="$500M+">$500M+</option>
+                      <option value="$1B+">$1B+</option>
+                    </select>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                        Street Address
+                      </label>
+                      <input
+                        type="text"
+                        name="street"
+                        defaultValue={editingCompany?.address?.street}
+                        className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                        City
+                      </label>
+                      <input
+                        type="text"
+                        name="city"
+                        defaultValue={editingCompany?.address?.city}
+                        className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                        State
+                      </label>
+                      <input
+                        type="text"
+                        name="state"
+                        defaultValue={editingCompany?.address?.state}
+                        className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                        ZIP Code
+                      </label>
+                      <input
+                        type="text"
+                        name="zipCode"
+                        defaultValue={editingCompany?.address?.zipCode}
+                        className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                      Country
+                    </label>
+                    <input
+                      type="text"
+                      name="country"
+                      defaultValue={editingCompany?.address?.country || 'USA'}
+                      className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                      Description
+                    </label>
+                    <textarea
+                      name="description"
+                      rows="3"
+                      defaultValue={editingCompany?.description}
+                      className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    />
+                  </div>
+
+                  <div className="flex space-x-3 pt-4">
+                    <button
+                      type="submit"
+                      className="flex-1 bg-gradient-to-r from-primary to-secondary text-white py-2 px-4 rounded-xl hover:shadow-lg transition-all"
+                    >
+                      {editingCompany ? 'Update Company' : 'Add Company'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowCompanyModal(false)
+                        setEditingCompany(null)
+                      }}
+                      className="flex-1 bg-surface-200 dark:bg-surface-700 text-surface-700 dark:text-surface-300 py-2 px-4 rounded-xl hover:bg-surface-300 dark:hover:bg-surface-600 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </motion.div>
+            </div>
+          )}
+        </div>
+      )
+    }
+
+if (activeSection === 'activities') {
+      return <ActivityTimeline />
+    }
+if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="flex items-center space-x-3">

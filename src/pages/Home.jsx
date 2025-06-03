@@ -8,9 +8,10 @@ import { toast } from 'react-toastify'
 const Home = ({ darkMode, toggleDarkMode }) => {
   const [activeSection, setActiveSection] = useState('dashboard')
 
-  const navigation = [
+const navigation = [
     { id: 'dashboard', label: 'Dashboard', icon: 'BarChart3' },
     { id: 'contacts', label: 'Contacts', icon: 'Users' },
+    { id: 'companies', label: 'Companies', icon: 'Building2' },
     { id: 'pipeline', label: 'Pipeline', icon: 'TrendingUp' },
     { id: 'tasks', label: 'Tasks', icon: 'CheckSquare' },
     { id: 'activities', label: 'Activities', icon: 'Activity' },
