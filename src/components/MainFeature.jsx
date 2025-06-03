@@ -14,11 +14,12 @@ const MainFeature = ({ activeSection }) => {
   const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
-  const [showModal, setShowModal] = useState(false)
+const [showModal, setShowModal] = useState(false)
   const [selectedContact, setSelectedContact] = useState(null)
+  const [showTaskModal, setShowTaskModal] = useState(false)
+  const [selectedTask, setSelectedTask] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [draggedDeal, setDraggedDeal] = useState(null)
-
   const pipelineStages = [
     { id: 'lead', label: 'Lead', color: 'bg-surface-500' },
     { id: 'qualified', label: 'Qualified', color: 'bg-blue-500' },
@@ -28,7 +29,7 @@ const MainFeature = ({ activeSection }) => {
     { id: 'closed-lost', label: 'Closed Lost', color: 'bg-red-500' }
   ]
 
-  const [formData, setFormData] = useState({
+const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
@@ -37,6 +38,14 @@ const MainFeature = ({ activeSection }) => {
     position: ''
   })
 
+  const [taskFormData, setTaskFormData] = useState({
+    title: '',
+    description: '',
+    priority: 'medium',
+    status: 'pending',
+    dueDate: '',
+    assignedTo: ''
+  })
   useEffect(() => {
     loadData()
   }, [activeSection])
@@ -93,6 +102,65 @@ const MainFeature = ({ activeSection }) => {
       toast.error(err?.message || 'Failed to save contact')
     } finally {
       setLoading(false)
+    }
+}
+
+  const handleTaskSubmit = async (e) => {
+    e.preventDefault()
+    if (!taskFormData.title?.trim()) {
+      toast.error('Please enter a task title')
+      return
+    }
+
+    try {
+      setLoading(true)
+      if (selectedTask) {
+        await taskService.update(selectedTask.id, taskFormData)
+        toast.success('Task updated successfully')
+      } else {
+        await taskService.create(taskFormData)
+        toast.success('Task created successfully')
+      }
+      setShowTaskModal(false)
+      setTaskFormData({
+        title: '',
+        description: '',
+        priority: 'medium',
+        status: 'pending',
+        dueDate: '',
+        assignedTo: ''
+      })
+      setSelectedTask(null)
+      loadData()
+    } catch (err) {
+      toast.error(err?.message || 'Failed to save task')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleTaskEdit = (task) => {
+    setSelectedTask(task)
+    setTaskFormData({
+      title: task.title || '',
+      description: task.description || '',
+      priority: task.priority || 'medium',
+      status: task.status || 'pending',
+      dueDate: task.dueDate || '',
+      assignedTo: task.assignedTo || ''
+    })
+    setShowTaskModal(true)
+  }
+
+  const handleTaskDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this task?')) return
+    
+    try {
+      await taskService.delete(id)
+      toast.success('Task deleted successfully')
+      loadData()
+    } catch (err) {
+      toast.error(err?.message || 'Failed to delete task')
     }
   }
 
@@ -213,11 +281,23 @@ const MainFeature = ({ activeSection }) => {
             </p>
           </div>
           
-          {activeSection === 'tasks' && (
+{activeSection === 'tasks' && (
             <div className="flex justify-end">
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => {
+                  setSelectedTask(null)
+                  setTaskFormData({
+                    title: '',
+                    description: '',
+                    priority: 'medium',
+                    status: 'pending',
+                    dueDate: '',
+                    assignedTo: ''
+                  })
+                  setShowTaskModal(true)
+                }}
                 className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-2 rounded-xl font-medium hover:shadow-lg transition-all duration-300 flex items-center space-x-2"
               >
                 <ApperIcon name="Plus" className="w-4 h-4" />
@@ -441,8 +521,26 @@ const MainFeature = ({ activeSection }) => {
                               </span>
                               <span className="text-surface-500">
                                 Assigned to: {task?.assignedTo || 'Unassigned'}
-                              </span>
+</span>
                             </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <motion.button
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              onClick={() => handleTaskEdit(task)}
+                              className="p-2 text-surface-400 hover:text-primary rounded-lg hover:bg-surface-100 dark:hover:bg-surface-600 transition-colors"
+                            >
+                              <ApperIcon name="Edit" className="w-4 h-4" />
+                            </motion.button>
+                            <motion.button
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              onClick={() => handleTaskDelete(task.id)}
+                              className="p-2 text-surface-400 hover:text-red-500 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-600 transition-colors"
+                            >
+                              <ApperIcon name="Trash2" className="w-4 h-4" />
+                            </motion.button>
                           </div>
                         </motion.div>
                       )
@@ -609,6 +707,139 @@ const MainFeature = ({ activeSection }) => {
                     className="px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg hover:shadow-lg transition-all duration-300 disabled:opacity-50"
                   >
                     {loading ? 'Saving...' : (selectedContact ? 'Update' : 'Create')}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+)}
+      </AnimatePresence>
+
+      {/* Task Modal */}
+      <AnimatePresence>
+        {showTaskModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+            onClick={() => setShowTaskModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white dark:bg-surface-800 rounded-2xl border border-surface-200 dark:border-surface-700 p-6 w-full max-w-md"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-semibold text-surface-900 dark:text-white">
+                  {selectedTask ? 'Edit Task' : 'Add New Task'}
+                </h3>
+                <button
+                  onClick={() => setShowTaskModal(false)}
+                  className="p-2 hover:bg-surface-100 dark:hover:bg-surface-700 rounded-lg transition-colors"
+                >
+                  <ApperIcon name="X" className="w-5 h-5 text-surface-500" />
+                </button>
+              </div>
+
+              <form onSubmit={handleTaskSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                    Title *
+                  </label>
+                  <input
+                    type="text"
+                    value={taskFormData.title}
+                    onChange={(e) => setTaskFormData({ ...taskFormData, title: e.target.value })}
+                    className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                    Description
+                  </label>
+                  <textarea
+                    value={taskFormData.description}
+                    onChange={(e) => setTaskFormData({ ...taskFormData, description: e.target.value })}
+                    rows={3}
+                    className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                      Priority
+                    </label>
+                    <select
+                      value={taskFormData.priority}
+                      onChange={(e) => setTaskFormData({ ...taskFormData, priority: e.target.value })}
+                      className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                    >
+                      <option value="low">Low</option>
+                      <option value="medium">Medium</option>
+                      <option value="high">High</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                      Status
+                    </label>
+                    <select
+                      value={taskFormData.status}
+                      onChange={(e) => setTaskFormData({ ...taskFormData, status: e.target.value })}
+                      className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                    >
+                      <option value="pending">Pending</option>
+                      <option value="in-progress">In Progress</option>
+                      <option value="completed">Completed</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                    Due Date
+                  </label>
+                  <input
+                    type="date"
+                    value={taskFormData.dueDate}
+                    onChange={(e) => setTaskFormData({ ...taskFormData, dueDate: e.target.value })}
+                    className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                    Assigned To
+                  </label>
+                  <input
+                    type="text"
+                    value={taskFormData.assignedTo}
+                    onChange={(e) => setTaskFormData({ ...taskFormData, assignedTo: e.target.value })}
+                    className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                    placeholder="Enter name or email"
+                  />
+                </div>
+
+                <div className="flex justify-end space-x-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowTaskModal(false)}
+                    className="px-4 py-2 border border-surface-300 dark:border-surface-600 text-surface-700 dark:text-surface-300 rounded-lg hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg hover:shadow-lg transition-all duration-300 disabled:opacity-50"
+                  >
+                    {loading ? 'Saving...' : (selectedTask ? 'Update' : 'Create')}
                   </button>
                 </div>
               </form>
