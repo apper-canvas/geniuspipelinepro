@@ -33,13 +33,15 @@ const [searchTerm, setSearchTerm] = useState('')
   const [emailContent, setEmailContent] = useState({ to: '', subject: '', body: '' })
   const [emailSearchTerm, setEmailSearchTerm] = useState('')
   const [emailFilter, setEmailFilter] = useState('all')
-  const [showNotesModal, setShowNotesModal] = useState(false)
+const [showNotesModal, setShowNotesModal] = useState(false)
   const [selectedEntity, setSelectedEntity] = useState(null)
   const [notes, setNotes] = useState([])
   const [teamMembers] = useState([
-    { id: 1, name: 'John Doe', username: 'john.doe' },
-    { id: 2, name: 'Jane Smith', username: 'jane.smith' },
-    { id: 3, name: 'Mike Johnson', username: 'mike.johnson' }
+    { id: 1, name: 'John Smith', username: 'john.smith', email: 'john.smith@company.com', role: 'Sales Manager' },
+    { id: 2, name: 'Jane Doe', username: 'jane.doe', email: 'jane.doe@company.com', role: 'Account Executive' },
+    { id: 3, name: 'Mike Johnson', username: 'mike.johnson', email: 'mike.johnson@company.com', role: 'Sales Representative' },
+    { id: 4, name: 'Sarah Wilson', username: 'sarah.wilson', email: 'sarah.wilson@company.com', role: 'Legal Counsel' },
+    { id: 5, name: 'David Chen', username: 'david.chen', email: 'david.chen@company.com', role: 'Marketing Manager' }
   ])
 const [draggedDeal, setDraggedDeal] = useState(null)
   const [showDealModal, setShowDealModal] = useState(false)
@@ -563,20 +565,32 @@ const getTaskPriority = (priority) => {
 return matchesSearch && matchesFilter
   }) || []
 
-  const handleAddNote = async (noteData) => {
+const handleAddNote = async (noteData) => {
     try {
+      // Extract tagged users from content
+      const tagMatches = noteData.content.match(/@[\w.]+/g) || []
+      const taggedUsers = tagMatches.map(tag => {
+        const username = tag.slice(1) // Remove @ symbol
+        return teamMembers.find(member => member.username === username)
+      }).filter(Boolean) // Remove any undefined matches
+
       const newNote = {
         id: Date.now(),
         content: noteData.content,
         entityType: selectedEntity?.type,
         entityId: selectedEntity?.data?.id,
-        author: { name: 'Current User' },
+        author: { name: 'Current User', username: 'current.user' },
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        taggedUsers: []
+        taggedUsers: taggedUsers
       }
       setNotes([...notes, newNote])
       toast.success('Note added successfully')
+      
+      // Notify tagged users
+      if (taggedUsers.length > 0) {
+        toast.info(`Tagged ${taggedUsers.length} team member${taggedUsers.length > 1 ? 's' : ''}`)
+      }
     } catch (error) {
       toast.error('Failed to add note')
     }
@@ -1737,23 +1751,20 @@ onClick={() => {
                         e.target.reset()
                       }
                     }}
-                    className="space-y-3"
+className="space-y-3"
                   >
                     <div>
                       <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
                         Add Internal Note
                       </label>
-                      <div className="relative">
-                        <textarea
-                          name="content"
-                          rows={3}
-                          className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all resize-none"
-                          placeholder="Write your note here... Use @username to tag team members"
-                        />
-                        <div className="absolute bottom-2 right-2 text-xs text-surface-500">
-                          Available users: {teamMembers.map(member => `@${member.username}`).join(', ')}
-                        </div>
-                      </div>
+                      <TaggingInput 
+                        teamMembers={teamMembers}
+                        onSubmit={(content) => {
+                          if (content?.trim()) {
+                            handleAddNote({ content })
+                          }
+                        }}
+                      />
                     </div>
                     <div className="flex justify-end">
                       <button
@@ -2234,8 +2245,155 @@ onClick={() => {
             </motion.div>
           </motion.div>
         )}
-      </AnimatePresence>
+</AnimatePresence>
     </div>
+  )
+}
+
+// TaggingInput Component for team member mentions
+const TaggingInput = ({ teamMembers, onSubmit }) => {
+  const [content, setContent] = useState('')
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const [suggestions, setSuggestions] = useState([])
+  const [selectedSuggestion, setSelectedSuggestion] = useState(0)
+  const [mentionStart, setMentionStart] = useState(0)
+  const textareaRef = React.useRef(null)
+
+  const handleContentChange = (e) => {
+    const value = e.target.value
+    const cursorPosition = e.target.selectionStart
+    setContent(value)
+
+    // Check for @ mention
+    const beforeCursor = value.substring(0, cursorPosition)
+    const mentionMatch = beforeCursor.match(/@(\w*)$/)
+    
+    if (mentionMatch) {
+      const query = mentionMatch[1].toLowerCase()
+      const filtered = teamMembers.filter(member => 
+        member.username.toLowerCase().includes(query) ||
+        member.name.toLowerCase().includes(query)
+      )
+      
+      if (filtered.length > 0) {
+        setSuggestions(filtered)
+        setShowSuggestions(true)
+        setSelectedSuggestion(0)
+        setMentionStart(cursorPosition - mentionMatch[0].length)
+      } else {
+        setShowSuggestions(false)
+      }
+    } else {
+      setShowSuggestions(false)
+    }
+  }
+
+  const insertMention = (member) => {
+    const beforeMention = content.substring(0, mentionStart)
+    const afterCursor = content.substring(textareaRef.current.selectionStart)
+    const newContent = beforeMention + `@${member.username}` + afterCursor
+    
+    setContent(newContent)
+    setShowSuggestions(false)
+    
+    // Focus back to textarea
+    setTimeout(() => {
+      if (textareaRef.current) {
+        const newCursorPosition = beforeMention.length + member.username.length + 1
+        textareaRef.current.focus()
+        textareaRef.current.setSelectionRange(newCursorPosition, newCursorPosition)
+      }
+    }, 0)
+  }
+
+  const handleKeyDown = (e) => {
+    if (showSuggestions) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        setSelectedSuggestion(prev => 
+          prev < suggestions.length - 1 ? prev + 1 : 0
+        )
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        setSelectedSuggestion(prev => 
+          prev > 0 ? prev - 1 : suggestions.length - 1
+        )
+      } else if (e.key === 'Enter' || e.key === 'Tab') {
+        e.preventDefault()
+        insertMention(suggestions[selectedSuggestion])
+      } else if (e.key === 'Escape') {
+        setShowSuggestions(false)
+      }
+    }
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (content.trim()) {
+      onSubmit(content)
+      setContent('')
+      setShowSuggestions(false)
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-3">
+      <div className="relative">
+        <textarea
+          ref={textareaRef}
+          value={content}
+          onChange={handleContentChange}
+          onKeyDown={handleKeyDown}
+          rows={3}
+          className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all resize-none"
+          placeholder="Write your note here... Use @username to tag team members"
+        />
+        
+        {showSuggestions && (
+          <div className="absolute z-10 mt-1 w-full max-w-xs bg-white dark:bg-surface-800 border border-surface-300 dark:border-surface-600 rounded-lg shadow-lg">
+            {suggestions.map((member, index) => (
+              <div
+                key={member.id}
+                className={`px-3 py-2 cursor-pointer transition-colors ${
+                  index === selectedSuggestion 
+                    ? 'bg-primary/10 text-primary' 
+                    : 'hover:bg-surface-50 dark:hover:bg-surface-700'
+                }`}
+                onClick={() => insertMention(member)}
+              >
+                <div className="flex items-center space-x-2">
+                  <div className="w-6 h-6 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white text-xs font-semibold">
+                    {member.name.charAt(0)}
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-surface-900 dark:text-white">
+                      {member.name}
+                    </div>
+                    <div className="text-xs text-surface-500 dark:text-surface-400">
+                      @{member.username} • {member.role}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        
+        <div className="absolute bottom-2 right-2 text-xs text-surface-500">
+          Type @ to mention team members
+        </div>
+      </div>
+      
+      <div className="flex justify-end">
+        <button
+          type="submit"
+          className="px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg hover:shadow-lg transition-all duration-300 flex items-center space-x-2"
+        >
+          <ApperIcon name="Plus" className="w-4 h-4" />
+          <span>Add Note</span>
+        </button>
+      </div>
+    </form>
   )
 }
 
