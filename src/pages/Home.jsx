@@ -1,12 +1,14 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import MainFeature from '../components/MainFeature'
 import ApperIcon from '../components/ApperIcon'
+import MainFeature from '../components/MainFeature'
+import Dashboard from '../components/Dashboard'
+import { toast } from 'react-toastify'
 
 const Home = ({ darkMode, toggleDarkMode }) => {
-  const [activeSection, setActiveSection] = useState('contacts')
+  const [activeSection, setActiveSection] = useState('dashboard')
 
-const navigation = [
+  const navigation = [
     { id: 'dashboard', label: 'Dashboard', icon: 'BarChart3' },
     { id: 'contacts', label: 'Contacts', icon: 'Users' },
     { id: 'pipeline', label: 'Pipeline', icon: 'TrendingUp' },
@@ -27,14 +29,11 @@ const navigation = [
         <div className="p-6 border-b border-surface-200 dark:border-surface-700">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center">
-                <ApperIcon name="Zap" className="w-6 h-6 text-white" />
+              <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
+                <ApperIcon name="Zap" className="w-4 h-4 text-white" />
               </div>
-              <div>
-                <h1 className="text-xl font-bold text-surface-900 dark:text-white">PipelinePro</h1>
-                <p className="text-sm text-surface-600 dark:text-surface-400">CRM Platform</p>
-              </div>
-            </div>
+              <span className="font-bold text-xl text-surface-900 dark:text-white">CRM</span>
+</div>
             <button
               onClick={toggleDarkMode}
               className="p-2 rounded-xl bg-surface-100 dark:bg-surface-700 hover:bg-surface-200 dark:hover:bg-surface-600 transition-colors"
@@ -46,11 +45,10 @@ const navigation = [
             </button>
           </div>
         </div>
-
         {/* Navigation */}
-        <nav className="flex-1 p-6">
+<nav className="flex-1 p-6">
           <ul className="space-y-2">
-{navigation.map((item) => (
+            {navigation.map((item) => (
               <motion.li key={item.id}>
                 <motion.button
                   onClick={() => setActiveSection(item.id)}
