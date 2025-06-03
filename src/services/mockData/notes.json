@@ -1,0 +1,101 @@
+[
+  {
+    "id": "1",
+    "entityType": "contact",
+    "entityId": "1",
+    "content": "Had a great conversation with Sarah about their upcoming project. She mentioned they're looking to expand their team by 30% next quarter.",
+    "author": {
+      "id": "1",
+      "name": "John Smith",
+      "username": "john.smith",
+      "avatar": null
+    },
+    "taggedUsers": [
+      {
+        "id": "2",
+        "name": "Jane Doe",
+        "username": "jane.doe"
+      }
+    ],
+    "createdAt": "2024-01-22T10:30:00Z",
+    "updatedAt": "2024-01-22T10:30:00Z"
+  },
+  {
+    "id": "2",
+    "entityType": "contact",
+    "entityId": "1",
+    "content": "@jane.doe Please follow up on the budget discussion we had. Sarah wants to schedule a meeting next week.",
+    "author": {
+      "id": "1",
+      "name": "John Smith",
+      "username": "john.smith",
+      "avatar": null
+    },
+    "taggedUsers": [
+      {
+        "id": "2",
+        "name": "Jane Doe",
+        "username": "jane.doe"
+      }
+    ],
+    "createdAt": "2024-01-23T14:15:00Z",
+    "updatedAt": "2024-01-23T14:15:00Z"
+  },
+  {
+    "id": "3",
+    "entityType": "contact",
+    "entityId": "2",
+    "content": "Michael is very interested in our enterprise solution. He asked for a detailed demo focusing on scalability features.",
+    "author": {
+      "id": "2",
+      "name": "Jane Doe",
+      "username": "jane.doe",
+      "avatar": null
+    },
+    "taggedUsers": [],
+    "createdAt": "2024-01-24T09:45:00Z",
+    "updatedAt": "2024-01-24T09:45:00Z"
+  },
+  {
+    "id": "4",
+    "entityType": "contact",
+    "entityId": "3",
+    "content": "@mike.johnson Emily mentioned they have budget constraints but are still interested. We should prepare a scaled-down proposal.",
+    "author": {
+      "id": "1",
+      "name": "John Smith",
+      "username": "john.smith",
+      "avatar": null
+    },
+    "taggedUsers": [
+      {
+        "id": "3",
+        "name": "Mike Johnson",
+        "username": "mike.johnson"
+      }
+    ],
+    "createdAt": "2024-01-25T16:20:00Z",
+    "updatedAt": "2024-01-25T16:20:00Z"
+  },
+  {
+    "id": "5",
+    "entityType": "deal",
+    "entityId": "1",
+    "content": "This deal is moving fast. David seems very motivated to close before end of quarter. @sarah.wilson can you prepare the contract?",
+    "author": {
+      "id": "2",
+      "name": "Jane Doe",
+      "username": "jane.doe",
+      "avatar": null
+    },
+    "taggedUsers": [
+      {
+        "id": "4",
+        "name": "Sarah Wilson",
+        "username": "sarah.wilson"
+      }
+    ],
+    "createdAt": "2024-01-26T11:30:00Z",
+    "updatedAt": "2024-01-26T11:30:00Z"
+  }
+]

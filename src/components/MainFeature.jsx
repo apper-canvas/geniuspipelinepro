@@ -26,13 +26,21 @@ const [deals, setDeals] = useState([])
   const [selectedContact, setSelectedContact] = useState(null)
   const [selectedTask, setSelectedTask] = useState(null)
   const [selectedEmail, setSelectedEmail] = useState(null)
-  const [searchTerm, setSearchTerm] = useState('')
+const [searchTerm, setSearchTerm] = useState('')
   const [selectedFilter, setSelectedFilter] = useState('all')
   const [showEmailCompose, setShowEmailCompose] = useState(false)
   const [replyingTo, setReplyingTo] = useState(null)
   const [emailContent, setEmailContent] = useState({ to: '', subject: '', body: '' })
   const [emailSearchTerm, setEmailSearchTerm] = useState('')
   const [emailFilter, setEmailFilter] = useState('all')
+  const [showNotesModal, setShowNotesModal] = useState(false)
+  const [selectedEntity, setSelectedEntity] = useState(null)
+  const [notes, setNotes] = useState([])
+  const [teamMembers] = useState([
+    { id: 1, name: 'John Doe', username: 'john.doe' },
+    { id: 2, name: 'Jane Smith', username: 'jane.smith' },
+    { id: 3, name: 'Mike Johnson', username: 'mike.johnson' }
+  ])
 const [draggedDeal, setDraggedDeal] = useState(null)
   const [showDealModal, setShowDealModal] = useState(false)
 
@@ -433,9 +441,9 @@ const handleAddContact = async (contactData) => {
       firstName: contact.firstName || '',
       lastName: contact.lastName || '',
       email: contact.email || '',
-      phone: contact.phone || '',
-      company: contact.company || '',
-})
+company: contact.company || '',
+      position: contact.position || ''
+    })
     setShowModal(true)
   }
 
@@ -552,8 +560,51 @@ const getTaskPriority = (priority) => {
       (emailFilter === 'unread' && !email?.isRead) ||
       (emailFilter === 'read' && email?.isRead)
     
-    return matchesSearch && matchesFilter
+return matchesSearch && matchesFilter
   }) || []
+
+  const handleAddNote = async (noteData) => {
+    try {
+      const newNote = {
+        id: Date.now(),
+        content: noteData.content,
+        entityType: selectedEntity?.type,
+        entityId: selectedEntity?.data?.id,
+        author: { name: 'Current User' },
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        taggedUsers: []
+      }
+      setNotes([...notes, newNote])
+      toast.success('Note added successfully')
+    } catch (error) {
+      toast.error('Failed to add note')
+    }
+  }
+
+  const handleEditNote = async (noteId, newContent) => {
+    try {
+      setNotes(notes.map(note => 
+        note.id === noteId 
+          ? { ...note, content: newContent, updatedAt: new Date().toISOString() }
+          : note
+      ))
+      toast.success('Note updated successfully')
+    } catch (error) {
+      toast.error('Failed to update note')
+    }
+  }
+
+  const handleDeleteNote = async (noteId) => {
+    if (!window.confirm('Are you sure you want to delete this note?')) return
+    
+    try {
+      setNotes(notes.filter(note => note.id !== noteId))
+      toast.success('Note deleted successfully')
+    } catch (error) {
+      toast.error('Failed to delete note')
+    }
+  }
 
   if (activeSection === 'dashboard') {
     return <Dashboard />
@@ -1538,6 +1589,173 @@ onClick={() => {
 )}
       </AnimatePresence>
 
+      {/* Notes Modal */}
+      <AnimatePresence>
+        {showNotesModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+            onClick={() => setShowNotesModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white dark:bg-surface-800 rounded-2xl border border-surface-200 dark:border-surface-700 p-6 w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h3 className="text-xl font-semibold text-surface-900 dark:text-white">
+                    Internal Notes
+                  </h3>
+                  <p className="text-surface-600 dark:text-surface-400 text-sm">
+                    {selectedEntity?.type === 'contact' ? 'Contact:' : 'Deal:'} {selectedEntity?.data?.firstName ? `${selectedEntity.data.firstName} ${selectedEntity.data.lastName}` : selectedEntity?.data?.title || selectedEntity?.data?.name}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowNotesModal(false)}
+                  className="p-2 hover:bg-surface-100 dark:hover:bg-surface-700 rounded-lg transition-colors"
+                >
+                  <ApperIcon name="X" className="w-5 h-5 text-surface-500" />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-hidden flex flex-col">
+                {/* Notes List */}
+                <div className="flex-1 overflow-y-auto mb-6 space-y-4">
+                  {notes.length === 0 ? (
+                    <div className="text-center py-12">
+                      <ApperIcon name="MessageSquare" className="w-12 h-12 text-surface-400 mx-auto mb-4" />
+                      <p className="text-surface-600 dark:text-surface-400">No notes yet</p>
+                      <p className="text-surface-500 dark:text-surface-500 text-sm">Add the first internal note below</p>
+                    </div>
+                  ) : (
+                    notes.map((note) => (
+                      <motion.div
+                        key={note.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="bg-surface-50 dark:bg-surface-700/50 rounded-xl p-4 border border-surface-200 dark:border-surface-600"
+                      >
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                              {note.author?.name?.charAt(0) || 'U'}
+                            </div>
+                            <div>
+                              <p className="font-medium text-surface-900 dark:text-white text-sm">
+                                {note.author?.name || 'Unknown User'}
+                              </p>
+                              <p className="text-surface-500 dark:text-surface-400 text-xs">
+                                {format(new Date(note.createdAt), 'MMM dd, yyyy HH:mm')}
+                                {note.updatedAt !== note.createdAt && ' (edited)'}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <motion.button
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              onClick={() => {
+                                const newContent = prompt('Edit note:', note.content)
+                                if (newContent !== null && newContent !== note.content) {
+                                  handleEditNote(note.id, newContent)
+                                }
+                              }}
+                              className="p-1 text-surface-400 hover:text-primary rounded-lg hover:bg-surface-100 dark:hover:bg-surface-600 transition-colors"
+                            >
+                              <ApperIcon name="Edit" className="w-3 h-3" />
+                            </motion.button>
+                            <motion.button
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              onClick={() => handleDeleteNote(note.id)}
+                              className="p-1 text-surface-400 hover:text-red-500 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-600 transition-colors"
+                            >
+                              <ApperIcon name="Trash2" className="w-3 h-3" />
+                            </motion.button>
+                          </div>
+                        </div>
+                        <div className="text-surface-700 dark:text-surface-300 text-sm whitespace-pre-wrap mb-2">
+                          {note.content?.split(/(@[\w.]+)/g).map((part, index) => {
+                            if (part.startsWith('@')) {
+                              const username = part.slice(1)
+                              const taggedUser = note.taggedUsers?.find(user => user.username === username)
+                              return (
+                                <span
+                                  key={index}
+                                  className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-1 rounded"
+                                  title={taggedUser ? `${taggedUser.name} (${taggedUser.username})` : username}
+                                >
+                                  {part}
+                                </span>
+                              )
+                            }
+                            return part
+                          })}
+                        </div>
+                        {note.taggedUsers && note.taggedUsers.length > 0 && (
+                          <div className="flex items-center space-x-2 text-xs">
+                            <ApperIcon name="Users" className="w-3 h-3 text-surface-400" />
+                            <span className="text-surface-500 dark:text-surface-400">
+                              Tagged: {note.taggedUsers.map(user => user.name).join(', ')}
+                            </span>
+                          </div>
+                        )}
+                      </motion.div>
+                    ))
+                  )}
+                </div>
+
+                {/* Add Note Form */}
+                <div className="border-t border-surface-200 dark:border-surface-700 pt-4">
+                  <form
+                    onSubmit={(e) => {
+                      e.preventDefault()
+                      const formData = new FormData(e.target)
+                      const content = formData.get('content')
+                      if (content?.trim()) {
+                        handleAddNote({ content })
+                        e.target.reset()
+                      }
+                    }}
+                    className="space-y-3"
+                  >
+                    <div>
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                        Add Internal Note
+                      </label>
+                      <div className="relative">
+                        <textarea
+                          name="content"
+                          rows={3}
+                          className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all resize-none"
+                          placeholder="Write your note here... Use @username to tag team members"
+                        />
+                        <div className="absolute bottom-2 right-2 text-xs text-surface-500">
+                          Available users: {teamMembers.map(member => `@${member.username}`).join(', ')}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex justify-end">
+                      <button
+                        type="submit"
+                        className="px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg hover:shadow-lg transition-all duration-300 flex items-center space-x-2"
+                      >
+                        <ApperIcon name="Plus" className="w-4 h-4" />
+                        <span>Add Note</span>
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {/* Task Modal */}
       <AnimatePresence>
         {showTaskModal && (
