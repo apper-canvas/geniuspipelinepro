@@ -1574,28 +1574,40 @@ if (activeSection === 'dashboard') {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                         Contact
                       </label>
-                      <input
-                        type="text"
+                      <select
                         value={quoteFormData.contactId}
                         onChange={(e) => setQuoteFormData({ ...quoteFormData, contactId: e.target.value })}
                         className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      />
+                      >
+                        <option value="">Select contact</option>
+                        {contacts.map((contact) => (
+                          <option key={contact.id} value={contact.email}>
+                            {contact.firstName} {contact.lastName} - {contact.email}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                         Company
                       </label>
-                      <input
-                        type="text"
+                      <select
                         value={quoteFormData.companyId}
                         onChange={(e) => setQuoteFormData({ ...quoteFormData, companyId: e.target.value })}
                         className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      />
+                      >
+                        <option value="">Select company</option>
+                        {companies.map((company) => (
+                          <option key={company.id} value={company.name}>
+                            {company.name}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
 
