@@ -6,18 +6,24 @@ import ActivityTimeline from './ActivityTimeline'
 import { contactService } from '../services'
 import { dealService } from '../services'
 import { taskService } from '../services'
+import { emailService } from '../services'
 import { format, isToday, isTomorrow, isPast } from 'date-fns'
 
 const MainFeature = ({ activeSection }) => {
-  const [contacts, setContacts] = useState([])
+const [contacts, setContacts] = useState([])
   const [deals, setDeals] = useState([])
   const [tasks, setTasks] = useState([])
+  const [emails, setEmails] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
-const [showModal, setShowModal] = useState(false)
+  const [showModal, setShowModal] = useState(false)
   const [selectedContact, setSelectedContact] = useState(null)
   const [showTaskModal, setShowTaskModal] = useState(false)
   const [selectedTask, setSelectedTask] = useState(null)
+  const [showEmailCompose, setShowEmailCompose] = useState(false)
+  const [selectedEmail, setSelectedEmail] = useState(null)
+  const [emailSearchTerm, setEmailSearchTerm] = useState('')
+  const [emailFilter, setEmailFilter] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
   const [draggedDeal, setDraggedDeal] = useState(null)
   const pipelineStages = [
@@ -45,12 +51,19 @@ const [formData, setFormData] = useState({
     status: 'pending',
     dueDate: '',
     assignedTo: ''
+})
+
+  const [emailFormData, setEmailFormData] = useState({
+    to: '',
+    subject: '',
+    body: '',
+    replyTo: null
   })
   useEffect(() => {
     loadData()
   }, [activeSection])
 
-  const loadData = async () => {
+const loadData = async () => {
     setLoading(true)
     setError(null)
     try {
@@ -63,6 +76,9 @@ const [formData, setFormData] = useState({
       } else if (activeSection === 'tasks') {
         const result = await taskService.getAll()
         setTasks(result || [])
+      } else if (activeSection === 'emails') {
+        const result = await emailService.getAll()
+        setEmails(result || [])
       }
     } catch (err) {
       setError(err?.message || 'Failed to load data')
@@ -136,6 +152,82 @@ const [formData, setFormData] = useState({
       toast.error(err?.message || 'Failed to save task')
     } finally {
       setLoading(false)
+    }
+}
+
+  const handleEmailSubmit = async (e) => {
+    e.preventDefault()
+    if (!emailFormData.to?.trim() || !emailFormData.subject?.trim()) {
+      toast.error('Please fill in recipient and subject fields')
+      return
+    }
+
+    try {
+      setLoading(true)
+      const emailData = {
+        ...emailFormData,
+        timestamp: new Date().toISOString(),
+        from: 'user@company.com', // Would come from current user
+        status: 'sent'
+      }
+      
+      await emailService.create(emailData)
+      toast.success('Email sent successfully')
+      setShowEmailCompose(false)
+      setEmailFormData({
+        to: '',
+        subject: '',
+        body: '',
+        replyTo: null
+      })
+      loadData()
+    } catch (err) {
+      toast.error(err?.message || 'Failed to send email')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleEmailReply = (email) => {
+    setEmailFormData({
+      to: email.from,
+      subject: `Re: ${email.subject}`,
+      body: `\n\n--- Original Message ---\nFrom: ${email.from}\nDate: ${format(new Date(email.timestamp), 'PPpp')}\nSubject: ${email.subject}\n\n${email.body}`,
+      replyTo: email.id
+    })
+    setShowEmailCompose(true)
+  }
+
+  const handleEmailForward = (email) => {
+    setEmailFormData({
+      to: '',
+      subject: `Fwd: ${email.subject}`,
+      body: `\n\n--- Forwarded Message ---\nFrom: ${email.from}\nTo: ${email.to}\nDate: ${format(new Date(email.timestamp), 'PPpp')}\nSubject: ${email.subject}\n\n${email.body}`,
+      replyTo: null
+    })
+    setShowEmailCompose(true)
+  }
+
+  const handleEmailDelete = async (emailId) => {
+    if (!window.confirm('Are you sure you want to delete this email?')) return
+    
+    try {
+      await emailService.delete(emailId)
+      toast.success('Email deleted successfully')
+      loadData()
+    } catch (err) {
+      toast.error(err?.message || 'Failed to delete email')
+    }
+  }
+
+  const handleEmailMarkRead = async (emailId, isRead) => {
+    try {
+      const email = emails.find(e => e.id === emailId)
+      await emailService.update(emailId, { ...email, isRead })
+      toast.success(`Email marked as ${isRead ? 'read' : 'unread'}`)
+      loadData()
+    } catch (err) {
+      toast.error('Failed to update email status')
     }
   }
 
@@ -235,7 +327,20 @@ const [formData, setFormData] = useState({
     if (isToday(date)) return 'Due today'
     if (isTomorrow(date)) return 'Due tomorrow'
     return format(date, 'MMM dd, yyyy')
-  }
+}
+
+  const filteredEmails = emails?.filter(email => {
+    const matchesSearch = !emailSearchTerm || 
+      email?.subject?.toLowerCase().includes(emailSearchTerm.toLowerCase()) ||
+      email?.from?.toLowerCase().includes(emailSearchTerm.toLowerCase()) ||
+      email?.body?.toLowerCase().includes(emailSearchTerm.toLowerCase())
+    
+    const matchesFilter = emailFilter === 'all' || 
+      (emailFilter === 'unread' && !email?.isRead) ||
+      (emailFilter === 'read' && email?.isRead)
+    
+    return matchesSearch && matchesFilter
+  }) || []
 
   if (loading) {
     return (
@@ -561,7 +666,7 @@ const [formData, setFormData] = useState({
             >
               <ActivityTimeline />
             </motion.div>
-          )}
+)}
 
           {activeSection === 'emails' && (
             <motion.div
@@ -569,18 +674,109 @@ const [formData, setFormData] = useState({
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="h-full flex items-center justify-center"
+              className="h-full"
             >
-              <div className="text-center">
-                <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-primary/20 to-secondary/20 rounded-full flex items-center justify-center">
-                  <ApperIcon name="Mail" className="w-12 h-12 text-primary" />
+              <div className="grid gap-6 h-full">
+                {/* Email Toolbar */}
+                <div className="bg-white/80 dark:bg-surface-800/80 backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-700 p-4">
+                  <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <div className="relative">
+                        <ApperIcon name="Search" className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-surface-400" />
+                        <input
+                          type="text"
+                          placeholder="Search emails..."
+                          value={emailSearchTerm}
+                          onChange={(e) => setEmailSearchTerm(e.target.value)}
+                          className="pl-10 pr-4 py-2 w-full sm:w-80 border border-surface-300 dark:border-surface-600 rounded-xl bg-white/90 dark:bg-surface-800/90 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                        />
+                      </div>
+                      <select
+                        value={emailFilter}
+                        onChange={(e) => setEmailFilter(e.target.value)}
+                        className="px-4 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white/90 dark:bg-surface-800/90 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                      >
+                        <option value="all">All Emails</option>
+                        <option value="unread">Unread</option>
+                        <option value="read">Read</option>
+                      </select>
+                    </div>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        setEmailFormData({
+                          to: '',
+                          subject: '',
+                          body: '',
+                          replyTo: null
+                        })
+                        setShowEmailCompose(true)
+                      }}
+                      className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-2 rounded-xl font-medium hover:shadow-lg transition-all duration-300 flex items-center space-x-2"
+                    >
+                      <ApperIcon name="Plus" className="w-4 h-4" />
+                      <span>Compose</span>
+                    </motion.button>
+                  </div>
                 </div>
-                <h3 className="text-xl font-semibold text-surface-900 dark:text-white mb-2">
-                  Email Management
-                </h3>
-                <p className="text-surface-600 dark:text-surface-400">
-                  Manage email communications and correspondence
-                </p>
+
+                {/* Email List */}
+                <div className="bg-white/80 dark:bg-surface-800/80 backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-700 overflow-hidden">
+                  <div className="divide-y divide-surface-200 dark:divide-surface-700">
+                    {filteredEmails.length === 0 ? (
+                      <div className="p-12 text-center">
+                        <ApperIcon name="Mail" className="w-12 h-12 text-surface-400 mx-auto mb-4" />
+                        <p className="text-surface-600 dark:text-surface-400">No emails found</p>
+                      </div>
+                    ) : (
+                      filteredEmails.map((email) => (
+                        <motion.div
+                          key={email.id}
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className={`p-6 hover:bg-surface-50 dark:hover:bg-surface-700/50 transition-colors cursor-pointer ${
+                            !email?.isRead ? 'bg-blue-50/50 dark:bg-blue-900/20' : ''
+                          }`}
+                          onClick={() => setSelectedEmail(email)}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-start space-x-4 flex-1">
+                              <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white font-semibold">
+                                {email?.from?.charAt(0)?.toUpperCase() || 'U'}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between mb-1">
+                                  <p className={`font-medium truncate ${
+                                    !email?.isRead ? 'text-surface-900 dark:text-white' : 'text-surface-700 dark:text-surface-300'
+                                  }`}>
+                                    {email?.from || 'Unknown Sender'}
+                                  </p>
+                                  <span className="text-xs text-surface-500 ml-2">
+                                    {email?.timestamp ? format(new Date(email.timestamp), 'MMM dd, HH:mm') : ''}
+                                  </span>
+                                </div>
+                                <h4 className={`font-medium mb-1 truncate ${
+                                  !email?.isRead ? 'text-surface-900 dark:text-white' : 'text-surface-700 dark:text-surface-300'
+                                }`}>
+                                  {email?.subject || 'No Subject'}
+                                </h4>
+                                <p className="text-sm text-surface-600 dark:text-surface-400 line-clamp-2">
+                                  {email?.body || 'No content'}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center space-x-2 ml-4">
+                              {!email?.isRead && (
+                                <div className="w-2 h-2 bg-primary rounded-full"></div>
+                              )}
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))
+                    )}
+                  </div>
+                </div>
               </div>
             </motion.div>
           )}
@@ -843,6 +1039,198 @@ const [formData, setFormData] = useState({
                   </button>
                 </div>
               </form>
+            </motion.div>
+          </motion.div>
+        )}
+</AnimatePresence>
+
+      {/* Email Compose Modal */}
+      <AnimatePresence>
+        {showEmailCompose && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+            onClick={() => setShowEmailCompose(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white dark:bg-surface-800 rounded-2xl border border-surface-200 dark:border-surface-700 p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-semibold text-surface-900 dark:text-white">
+                  Compose Email
+                </h3>
+                <button
+                  onClick={() => setShowEmailCompose(false)}
+                  className="p-2 hover:bg-surface-100 dark:hover:bg-surface-700 rounded-lg transition-colors"
+                >
+                  <ApperIcon name="X" className="w-5 h-5 text-surface-500" />
+                </button>
+              </div>
+
+              <form onSubmit={handleEmailSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                    To *
+                  </label>
+                  <input
+                    type="email"
+                    value={emailFormData.to}
+                    onChange={(e) => setEmailFormData({ ...emailFormData, to: e.target.value })}
+                    className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                    placeholder="recipient@example.com"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                    Subject *
+                  </label>
+                  <input
+                    type="text"
+                    value={emailFormData.subject}
+                    onChange={(e) => setEmailFormData({ ...emailFormData, subject: e.target.value })}
+                    className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                    placeholder="Email subject"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                    Message
+                  </label>
+                  <textarea
+                    value={emailFormData.body}
+                    onChange={(e) => setEmailFormData({ ...emailFormData, body: e.target.value })}
+                    rows={10}
+                    className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                    placeholder="Type your message here..."
+                  />
+                </div>
+
+                <div className="flex justify-end space-x-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowEmailCompose(false)}
+                    className="px-4 py-2 border border-surface-300 dark:border-surface-600 text-surface-700 dark:text-surface-300 rounded-lg hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg hover:shadow-lg transition-all duration-300 disabled:opacity-50 flex items-center space-x-2"
+                  >
+                    <ApperIcon name="Send" className="w-4 h-4" />
+                    <span>{loading ? 'Sending...' : 'Send'}</span>
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Email Detail Modal */}
+      <AnimatePresence>
+        {selectedEmail && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+            onClick={() => setSelectedEmail(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white dark:bg-surface-800 rounded-2xl border border-surface-200 dark:border-surface-700 p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-start justify-between mb-6">
+                <div className="flex-1">
+                  <h3 className="text-xl font-semibold text-surface-900 dark:text-white mb-2">
+                    {selectedEmail?.subject || 'No Subject'}
+                  </h3>
+                  <div className="flex items-center space-x-4 text-sm text-surface-600 dark:text-surface-400">
+                    <span>From: {selectedEmail?.from}</span>
+                    <span>To: {selectedEmail?.to}</span>
+                    <span>{selectedEmail?.timestamp ? format(new Date(selectedEmail.timestamp), 'PPpp') : ''}</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSelectedEmail(null)}
+                  className="p-2 hover:bg-surface-100 dark:hover:bg-surface-700 rounded-lg transition-colors"
+                >
+                  <ApperIcon name="X" className="w-5 h-5 text-surface-500" />
+                </button>
+              </div>
+
+              <div className="border-t border-surface-200 dark:border-surface-700 pt-6 mb-6">
+                <div className="whitespace-pre-wrap text-surface-900 dark:text-white">
+                  {selectedEmail?.body || 'No content'}
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center pt-4 border-t border-surface-200 dark:border-surface-700">
+                <div className="flex space-x-3">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      handleEmailReply(selectedEmail)
+                      setSelectedEmail(null)
+                    }}
+                    className="px-4 py-2 bg-primary text-white rounded-lg hover:shadow-lg transition-all duration-300 flex items-center space-x-2"
+                  >
+                    <ApperIcon name="Reply" className="w-4 h-4" />
+                    <span>Reply</span>
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      handleEmailForward(selectedEmail)
+                      setSelectedEmail(null)
+                    }}
+                    className="px-4 py-2 border border-surface-300 dark:border-surface-600 text-surface-700 dark:text-surface-300 rounded-lg hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors flex items-center space-x-2"
+                  >
+                    <ApperIcon name="Forward" className="w-4 h-4" />
+                    <span>Forward</span>
+                  </motion.button>
+                </div>
+                <div className="flex space-x-3">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => handleEmailMarkRead(selectedEmail.id, !selectedEmail.isRead)}
+                    className="px-4 py-2 border border-surface-300 dark:border-surface-600 text-surface-700 dark:text-surface-300 rounded-lg hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors flex items-center space-x-2"
+                  >
+                    <ApperIcon name={selectedEmail.isRead ? "Mail" : "MailOpen"} className="w-4 h-4" />
+                    <span>{selectedEmail.isRead ? 'Mark Unread' : 'Mark Read'}</span>
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      handleEmailDelete(selectedEmail.id)
+                      setSelectedEmail(null)
+                    }}
+                    className="px-4 py-2 border border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors flex items-center space-x-2"
+                  >
+                    <ApperIcon name="Trash2" className="w-4 h-4" />
+                    <span>Delete</span>
+                  </motion.button>
+                </div>
+              </div>
             </motion.div>
           </motion.div>
         )}
