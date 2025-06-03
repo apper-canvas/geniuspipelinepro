@@ -1,0 +1,137 @@
+[
+  {
+    "id": "e1",
+    "contactId": "1",
+    "subject": "Re: Enterprise Software Proposal",
+    "body": "Hi Sarah, Thank you for the detailed proposal. Our team is reviewing the pricing tiers and implementation timeline. We have a few questions about the integration capabilities with our existing ERP system. Could we schedule a technical call this week? Best regards, Sarah Johnson",
+    "direction": "inbound",
+    "timestamp": "2024-02-04T09:15:00Z",
+    "attachments": []
+  },
+  {
+    "id": "e2",
+    "contactId": "1",
+    "subject": "Technical Integration Questions",
+    "body": "Hi Sarah, Following up on your email, I've attached our current system architecture diagram. Please review and let us know about the integration points and any potential challenges. We're particularly interested in real-time data synchronization. Looking forward to hearing from you. Best, Sales Team",
+    "direction": "outbound",
+    "timestamp": "2024-02-04T14:30:00Z",
+    "attachments": ["integration_questions.pdf"]
+  },
+  {
+    "id": "e3",
+    "contactId": "2",
+    "subject": "Cloud Migration Demo Feedback",
+    "body": "Hello Team, The demo yesterday was impressive! Our IT team was particularly excited about the automated scaling features and security protocols. We'd like to move forward with a pilot project for one of our smaller environments. What would be the next steps? Thanks, Michael Chen",
+    "direction": "inbound",
+    "timestamp": "2024-02-06T11:45:00Z",
+    "attachments": []
+  },
+  {
+    "id": "e4",
+    "contactId": "3",
+    "subject": "Marketing Automation Case Studies",
+    "body": "Hi Emily, Thank you for your interest in our marketing automation platform. I've attached several case studies from companies similar to yours in size and industry. Please note the significant improvements in lead conversion and customer engagement metrics. I'd love to discuss how we can achieve similar results for GlobalTech. Best regards, Lisa",
+    "direction": "outbound",
+    "timestamp": "2024-02-10T09:45:00Z",
+    "attachments": ["retail_success.pdf", "b2b_automation.pdf", "roi_calculator.xlsx"]
+  },
+  {
+    "id": "e5",
+    "contactId": "4",
+    "subject": "Custom Development Proposal Request",
+    "body": "Hi there, We're interested in discussing a custom development project for our startup. We need a scalable solution that can grow with our business. Our current tech stack includes React, Node.js, and PostgreSQL. Could you provide an initial proposal and timeline estimate? Thanks, David Thompson - StartupX",
+    "direction": "inbound",
+    "timestamp": "2024-02-16T14:20:00Z",
+    "attachments": ["tech_requirements.docx"]
+  },
+  {
+    "id": "e6",
+    "contactId": "5",
+    "subject": "Enterprise Support Package - Signed!",
+    "body": "Dear Jennifer, Congratulations! We're excited to officially welcome MegaCorp International as our newest enterprise client. The signed contract has been processed and your dedicated support team will be reaching out tomorrow to schedule the onboarding kickoff. Thank you for choosing our platform! Best regards, Account Management Team",
+    "direction": "outbound",
+    "timestamp": "2024-02-28T18:30:00Z",
+    "attachments": ["welcome_package.pdf", "support_contacts.pdf"]
+  },
+  {
+    "id": "e7",
+    "contactId": "6",
+    "subject": "Technical Consulting Scope Clarification",
+    "body": "Hi James, Thanks for the initial discussion about technical consulting services. To provide an accurate proposal, could you clarify a few points: 1) Expected project duration, 2) Specific technologies involved, 3) Team size requirements. I've attached our standard consulting framework for reference. Looking forward to your response. Best, Alex",
+    "direction": "outbound",
+    "timestamp": "2024-02-19T10:15:00Z",
+    "attachments": ["consulting_framework.pdf"]
+  },
+  {
+    "id": "e8",
+    "subject": "Partnership Agreement Draft Review",
+    "contactId": "7",
+    "body": "Hello Amanda, Please find attached the draft partnership agreement for your legal team's review. Key highlights include: revenue sharing model, territory definitions, and co-marketing commitments. We're flexible on most terms and look forward to your feedback. Let's target a signature date of March 15th. Regards, Business Development",
+    "direction": "outbound",
+    "timestamp": "2024-02-21T16:45:00Z",
+    "attachments": ["partnership_agreement_draft.pdf", "revenue_model.xlsx"]
+  },
+  {
+    "id": "e9",
+    "contactId": "8",
+    "subject": "Manufacturing Software Integration Questions",
+    "body": "Dear Sales Team, After reviewing your manufacturing software proposal, we have several integration questions: 1) Compatibility with our existing SAP system, 2) Data migration timeline and process, 3) Training requirements for our operators. Our production schedule is critical, so minimizing downtime is essential. Please advise. Best regards, Robert Brown",
+    "direction": "inbound",
+    "timestamp": "2024-02-23T13:30:00Z",
+    "attachments": ["current_system_specs.pdf"]
+  },
+  {
+    "id": "e10",
+    "contactId": "9",
+    "subject": "Financial Analytics Platform - Executive Demo",
+    "body": "Hi Lisa, Thank you for the comprehensive financial analytics demo. Our executive team was impressed with the real-time reporting capabilities and predictive analytics features. We're ready to move forward with implementation. Could you prepare the final contract with the discussed pricing? We'd like to go live by end of Q1. Best, Jennifer Lee",
+    "direction": "inbound",
+    "timestamp": "2024-02-26T15:20:00Z",
+    "attachments": []
+  },
+  {
+    "id": "e11",
+    "contactId": "10",
+    "subject": "Retail POS System Evaluation",
+    "body": "Hello, We're evaluating POS systems for our retail chain (12 locations). Key requirements include: inventory management, customer loyalty program integration, and detailed sales analytics. We're comparing several vendors and would appreciate a competitive quote. Our decision timeline is 6-8 weeks. Thanks, Christopher Wilson",
+    "direction": "inbound",
+    "timestamp": "2024-02-28T12:10:00Z",
+    "attachments": ["pos_requirements.docx"]
+  },
+  {
+    "id": "e12",
+    "contactId": "11",
+    "subject": "Healthcare Compliance Documentation",
+    "body": "Hi Michelle, As promised, I'm sending our complete HIPAA compliance documentation package. This includes: security certifications, audit reports, data encryption standards, and access control policies. Our healthcare clients particularly appreciate our role-based access system. Happy to schedule a compliance review call if needed. Best regards, Emily",
+    "direction": "outbound",
+    "timestamp": "2024-03-02T10:30:00Z",
+    "attachments": ["hipaa_compliance.pdf", "security_audit_2024.pdf", "encryption_standards.pdf"]
+  },
+  {
+    "id": "e13",
+    "contactId": "12",
+    "subject": "Thank You - Logistics Project Feedback",
+    "body": "Dear Kevin, Although we weren't selected for the logistics management project, we appreciate the thorough evaluation process. Your feedback about pricing and implementation timeline will help us improve our offerings. We'd welcome the opportunity to work together on future projects. Please keep us in mind for any upcoming initiatives. Best regards, Sales Team",
+    "direction": "outbound",
+    "timestamp": "2024-02-16T14:45:00Z",
+    "attachments": []
+  },
+  {
+    "id": "e14",
+    "contactId": "13",
+    "subject": "Education Sector Pricing - Special Discount",
+    "body": "Hi Nicole, Thank you for your interest in our technology solutions for Education Institute. We offer special academic pricing for educational institutions - typically 30-40% below our commercial rates. I've attached our education-specific feature set and pricing guide. We also provide free training for faculty and staff. Would you like to schedule a demonstration? Best, Rachel",
+    "direction": "outbound",
+    "timestamp": "2024-02-25T11:20:00Z",
+    "attachments": ["education_pricing.pdf", "academic_features.pdf"]
+  },
+  {
+    "id": "e15",
+    "contactId": "14",
+    "subject": "Real Estate CRM Integration Possibilities",
+    "body": "Hello Daniel, Great meeting you at the Real Estate Technology Conference! As discussed, our CRM platform has specific features designed for real estate professionals: lead tracking from multiple sources, automated follow-up sequences, and commission tracking. I'd love to show you how Premier Real Estate could benefit. Are you available for a demo next week? Best regards, James",
+    "direction": "outbound",
+    "timestamp": "2024-02-27T09:15:00Z",
+    "attachments": ["real_estate_features.pdf"]
+  }
+]

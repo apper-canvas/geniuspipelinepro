@@ -1,0 +1,206 @@
+[
+  {
+    "id": "a1",
+    "type": "call",
+    "description": "Initial discovery call - discussed current pain points and budget",
+    "contactId": "1",
+    "dealId": "d1",
+    "userId": "user1",
+    "timestamp": "2024-02-01T10:30:00Z",
+    "metadata": {
+      "duration": "45 minutes",
+      "outcome": "positive",
+      "nextSteps": "Send proposal by Friday"
+    }
+  },
+  {
+    "id": "a2",
+    "type": "email",
+    "description": "Sent detailed proposal with pricing tiers",
+    "contactId": "1",
+    "dealId": "d1",
+    "userId": "user1",
+    "timestamp": "2024-02-03T14:15:00Z",
+    "metadata": {
+      "subject": "Enterprise Software Proposal - TechCorp Solutions",
+      "attachments": ["proposal.pdf", "pricing.xlsx"]
+    }
+  },
+  {
+    "id": "a3",
+    "type": "meeting",
+    "description": "Technical demo session with IT team",
+    "contactId": "2",
+    "dealId": "d2",
+    "userId": "user2",
+    "timestamp": "2024-02-05T11:00:00Z",
+    "metadata": {
+      "attendees": ["Michael Chen", "IT Director", "System Admin"],
+      "duration": "90 minutes",
+      "demo_feedback": "Very positive response to cloud features"
+    }
+  },
+  {
+    "id": "a4",
+    "type": "call",
+    "description": "Follow-up call to address pricing concerns",
+    "contactId": "2",
+    "dealId": "d2",
+    "userId": "user2",
+    "timestamp": "2024-02-08T15:30:00Z",
+    "metadata": {
+      "duration": "30 minutes",
+      "concerns": ["pricing", "timeline"],
+      "resolution": "Offered flexible payment terms"
+    }
+  },
+  {
+    "id": "a5",
+    "type": "email",
+    "description": "Marketing automation case studies sent",
+    "contactId": "3",
+    "dealId": "d3",
+    "userId": "user3",
+    "timestamp": "2024-02-10T09:45:00Z",
+    "metadata": {
+      "subject": "Case Studies - Similar Companies Success Stories",
+      "case_studies": ["retail_success.pdf", "b2b_automation.pdf"]
+    }
+  },
+  {
+    "id": "a6",
+    "type": "meeting",
+    "description": "Stakeholder alignment meeting",
+    "contactId": "3",
+    "dealId": "d3",
+    "userId": "user3",
+    "timestamp": "2024-02-12T13:20:00Z",
+    "metadata": {
+      "attendees": ["Emily Rodriguez", "CMO", "Digital Marketing Manager"],
+      "outcome": "All stakeholders aligned on implementation plan"
+    }
+  },
+  {
+    "id": "a7",
+    "type": "call",
+    "description": "Initial qualification call with startup founder",
+    "contactId": "4",
+    "dealId": "d4",
+    "userId": "user4",
+    "timestamp": "2024-02-15T16:00:00Z",
+    "metadata": {
+      "duration": "60 minutes",
+      "budget_range": "$50k-$100k",
+      "timeline": "Q2 2024"
+    }
+  },
+  {
+    "id": "a8",
+    "type": "contract_signed",
+    "description": "Enterprise support package contract executed",
+    "contactId": "5",
+    "dealId": "d5",
+    "userId": "user1",
+    "timestamp": "2024-02-28T17:00:00Z",
+    "metadata": {
+      "contract_value": 200000,
+      "contract_duration": "3 years",
+      "start_date": "2024-03-01"
+    }
+  },
+  {
+    "id": "a9",
+    "type": "email",
+    "description": "Technical requirements document shared",
+    "contactId": "6",
+    "dealId": "d6",
+    "userId": "user2",
+    "timestamp": "2024-02-18T10:30:00Z",
+    "metadata": {
+      "subject": "Technical Consulting - Requirements Document",
+      "document": "tech_requirements_v2.pdf"
+    }
+  },
+  {
+    "id": "a10",
+    "type": "meeting",
+    "description": "Partnership negotiation session",
+    "contactId": "7",
+    "dealId": "d7",
+    "userId": "user1",
+    "timestamp": "2024-02-20T14:45:00Z",
+    "metadata": {
+      "attendees": ["Amanda Davis", "Legal Counsel", "Business Development"],
+      "topics": ["revenue sharing", "territory rights", "co-marketing"]
+    }
+  },
+  {
+    "id": "a11",
+    "type": "call",
+    "description": "Manufacturing requirements assessment",
+    "contactId": "8",
+    "dealId": "d8",
+    "userId": "user4",
+    "timestamp": "2024-02-22T11:15:00Z",
+    "metadata": {
+      "duration": "45 minutes",
+      "current_systems": ["SAP", "legacy MRP"],
+      "integration_needs": "high"
+    }
+  },
+  {
+    "id": "a12",
+    "type": "email",
+    "description": "Financial platform demo recording sent",
+    "contactId": "9",
+    "dealId": "d9",
+    "userId": "user3",
+    "timestamp": "2024-02-25T16:20:00Z",
+    "metadata": {
+      "subject": "Demo Recording - Financial Analytics Platform",
+      "video_link": "https://demo.platform.com/recording/12345"
+    }
+  },
+  {
+    "id": "a13",
+    "type": "meeting",
+    "description": "Retail location site visit",
+    "contactId": "10",
+    "dealId": "d10",
+    "userId": "user4",
+    "timestamp": "2024-02-27T13:00:00Z",
+    "metadata": {
+      "location": "Downtown Store #1",
+      "current_pos": "Legacy system",
+      "staff_count": 15
+    }
+  },
+  {
+    "id": "a14",
+    "type": "call",
+    "description": "HIPAA compliance discussion",
+    "contactId": "11",
+    "dealId": "d11",
+    "userId": "user2",
+    "timestamp": "2024-03-01T10:00:00Z",
+    "metadata": {
+      "duration": "40 minutes",
+      "compliance_concerns": ["data encryption", "audit trails", "access controls"],
+      "certification_status": "SOC 2 Type II"
+    }
+  },
+  {
+    "id": "a15",
+    "type": "meeting",
+    "description": "Post-loss analysis meeting",
+    "contactId": "12",
+    "dealId": "d12",
+    "userId": "user1",
+    "timestamp": "2024-02-15T11:30:00Z",
+    "metadata": {
+      "loss_reasons": ["price", "feature gap", "timing"],
+      "lessons_learned": "Need better ROI calculator",
+      "future_opportunity": "possible in 6 months"
+    }
+  }
+]
