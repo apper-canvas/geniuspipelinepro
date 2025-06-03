@@ -112,20 +112,31 @@ useEffect(() => {
       loadEmails()
     }
   }, [activeSection])
-  // Clear company details when switching away from companies section
+// Clear company and quote details when switching away from their sections
   useEffect(() => {
     if (activeSection !== 'companies') {
       setSelectedCompanyDetail(null)
       setShowCompanyDetailModal(false)
     }
+    if (activeSection !== 'quotes') {
+      setSelectedQuoteDetail(null)
+      setShowQuoteDetailModal(false)
+    }
   }, [activeSection])
 
   // Auto-show company details modal when company is selected
-useEffect(() => {
+  useEffect(() => {
     if (selectedCompanyDetail && !showCompanyDetailModal) {
       setShowCompanyDetailModal(true)
     }
   }, [selectedCompanyDetail, showCompanyDetailModal])
+
+  // Auto-show quote details modal when quote is selected
+  useEffect(() => {
+    if (selectedQuoteDetail && !showQuoteDetailModal) {
+      setShowQuoteDetailModal(true)
+    }
+  }, [selectedQuoteDetail, showQuoteDetailModal])
 
   const loadCompanies = async () => {
     try {
