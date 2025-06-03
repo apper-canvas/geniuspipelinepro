@@ -22,8 +22,10 @@ const [deals, setDeals] = useState([])
   const [showModal, setShowModal] = useState(false)
   const [editingContact, setEditingContact] = useState(null)
   const [editingCompany, setEditingCompany] = useState(null)
-  const [editingTask, setEditingTask] = useState(null)
+const [editingTask, setEditingTask] = useState(null)
   const [selectedContact, setSelectedContact] = useState(null)
+  const [selectedContactDetail, setSelectedContactDetail] = useState(null)
+  const [showContactDetailModal, setShowContactDetailModal] = useState(false)
   const [selectedTask, setSelectedTask] = useState(null)
   const [selectedEmail, setSelectedEmail] = useState(null)
 const [searchTerm, setSearchTerm] = useState('')
@@ -457,8 +459,13 @@ company: contact.company || '',
       toast.success('Contact deleted successfully')
       loadData()
     } catch (err) {
-      toast.error(err?.message || 'Failed to delete contact')
+toast.error(err?.message || 'Failed to delete contact')
     }
+  }
+
+  const handleContactClick = (contact) => {
+    setSelectedContactDetail(contact)
+    setShowContactDetailModal(true)
   }
 
   const filteredContacts = contacts.filter(contact => {
@@ -1165,12 +1172,13 @@ onClick={() => {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-surface-200 dark:divide-surface-700">
-                        {filteredContacts.map((contact) => (
+{filteredContacts.map((contact) => (
                           <motion.tr
                             key={contact.id}
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            className="hover:bg-surface-50 dark:hover:bg-surface-700/50 transition-colors"
+                            className="hover:bg-surface-50 dark:hover:bg-surface-700/50 transition-colors cursor-pointer"
+                            onClick={() => handleContactClick(contact)}
                           >
                             <td className="px-6 py-4">
                               <div className="flex items-center space-x-3">
@@ -1197,11 +1205,14 @@ onClick={() => {
                               {contact?.phone || 'No phone'}
                             </td>
                             <td className="px-6 py-4 text-right">
-                              <div className="flex items-center justify-end space-x-2">
+<div className="flex items-center justify-end space-x-2">
                                 <motion.button
                                   whileHover={{ scale: 1.1 }}
                                   whileTap={{ scale: 0.9 }}
-                                  onClick={() => handleEdit(contact)}
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleEdit(contact)
+                                  }}
                                   className="p-2 text-surface-400 hover:text-primary rounded-lg hover:bg-surface-100 dark:hover:bg-surface-600 transition-colors"
                                 >
                                   <ApperIcon name="Edit" className="w-4 h-4" />
@@ -1209,7 +1220,10 @@ onClick={() => {
                                 <motion.button
                                   whileHover={{ scale: 1.1 }}
                                   whileTap={{ scale: 0.9 }}
-                                  onClick={() => handleDelete(contact.id)}
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleDelete(contact.id)
+                                  }}
                                   className="p-2 text-surface-400 hover:text-red-500 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-600 transition-colors"
                                 >
                                   <ApperIcon name="Trash2" className="w-4 h-4" />
@@ -2224,8 +2238,183 @@ onClick={() => {
               </form>
             </motion.div>
           </motion.div>
+)}
+      </AnimatePresence>
+
+      {/* Contact Detail Modal */}
+      <AnimatePresence>
+        {showContactDetailModal && selectedContactDetail && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+            onClick={() => setShowContactDetailModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white dark:bg-surface-800 rounded-2xl border border-surface-200 dark:border-surface-700 p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-semibold text-surface-900 dark:text-white">
+                  Contact Details
+                </h3>
+                <button
+                  onClick={() => setShowContactDetailModal(false)}
+                  className="p-2 hover:bg-surface-100 dark:hover:bg-surface-700 rounded-lg transition-colors"
+                >
+                  <ApperIcon name="X" className="w-5 h-5 text-surface-500" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* Contact Header */}
+                <div className="flex items-center space-x-4 p-4 bg-surface-50 dark:bg-surface-700/50 rounded-xl">
+                  <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white font-bold text-xl">
+                    {selectedContactDetail?.firstName?.charAt(0) || '?'}{selectedContactDetail?.lastName?.charAt(0) || ''}
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-xl font-semibold text-surface-900 dark:text-white">
+                      {selectedContactDetail?.firstName || ''} {selectedContactDetail?.lastName || ''}
+                    </h4>
+                    <p className="text-surface-600 dark:text-surface-400">
+                      {selectedContactDetail?.position || 'No position'} {selectedContactDetail?.company ? `at ${selectedContactDetail.company}` : ''}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Contact Information */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <h5 className="text-lg font-semibold text-surface-900 dark:text-white">Contact Information</h5>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Mail" className="w-4 h-4 text-primary" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Email</p>
+                          <p className="text-surface-900 dark:text-white">{selectedContactDetail?.email || 'No email'}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-secondary/10 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Phone" className="w-4 h-4 text-secondary" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Phone</p>
+                          <p className="text-surface-900 dark:text-white">{selectedContactDetail?.phone || 'No phone'}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Building2" className="w-4 h-4 text-accent" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Company</p>
+                          <p className="text-surface-900 dark:text-white">{selectedContactDetail?.company || 'No company'}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Briefcase" className="w-4 h-4 text-green-600 dark:text-green-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Position</p>
+                          <p className="text-surface-900 dark:text-white">{selectedContactDetail?.position || 'No position'}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h5 className="text-lg font-semibold text-surface-900 dark:text-white">Additional Information</h5>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Calendar" className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Created</p>
+                          <p className="text-surface-900 dark:text-white">
+                            {selectedContactDetail?.createdAt ? format(new Date(selectedContactDetail.createdAt), 'PPP') : 'Unknown'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Clock" className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Last Updated</p>
+                          <p className="text-surface-900 dark:text-white">
+                            {selectedContactDetail?.updatedAt ? format(new Date(selectedContactDetail.updatedAt), 'PPP') : 'Unknown'}
+                          </p>
+                        </div>
+                      </div>
+
+                      {selectedContactDetail?.tags && selectedContactDetail.tags.length > 0 && (
+                        <div className="flex items-start space-x-3">
+                          <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
+                            <ApperIcon name="Tag" className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                          </div>
+                          <div>
+                            <p className="text-sm text-surface-500 dark:text-surface-400">Tags</p>
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {selectedContactDetail.tags.map((tag, index) => (
+                                <span key={index} className="px-2 py-1 bg-surface-100 dark:bg-surface-700 text-surface-700 dark:text-surface-300 text-xs rounded-full">
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex justify-end space-x-3 pt-6 border-t border-surface-200 dark:border-surface-700">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      setShowContactDetailModal(false)
+                      handleEdit(selectedContactDetail)
+                    }}
+                    className="px-6 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg hover:shadow-lg transition-all duration-300 flex items-center space-x-2"
+                  >
+                    <ApperIcon name="Edit" className="w-4 h-4" />
+                    <span>Edit Contact</span>
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      setSelectedEntity({ type: 'contact', data: selectedContactDetail })
+                      setShowNotesModal(true)
+                    }}
+                    className="px-6 py-2 border border-surface-300 dark:border-surface-600 text-surface-700 dark:text-surface-300 rounded-lg hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors flex items-center space-x-2"
+                  >
+                    <ApperIcon name="MessageSquare" className="w-4 h-4" />
+                    <span>View Notes</span>
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
-</AnimatePresence>
+      </AnimatePresence>
     </div>
   )
 }
