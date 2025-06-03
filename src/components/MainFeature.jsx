@@ -207,11 +207,24 @@ const MainFeature = ({ activeSection }) => {
             <p className="text-surface-600 dark:text-surface-400 mt-1">
               {activeSection === 'contacts' && 'Manage your customer relationships'}
               {activeSection === 'pipeline' && 'Track deals through your sales process'}
-              {activeSection === 'tasks' && 'Stay on top of your to-do list'}
+{activeSection === 'tasks' && 'Stay on top of your to-do list'}
               {activeSection === 'activities' && 'View all customer interactions'}
               {activeSection === 'emails' && 'Manage email communications'}
             </p>
           </div>
+          
+          {activeSection === 'tasks' && (
+            <div className="flex justify-end">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-2 rounded-xl font-medium hover:shadow-lg transition-all duration-300 flex items-center space-x-2"
+              >
+                <ApperIcon name="Plus" className="w-4 h-4" />
+                <span>New Task</span>
+              </motion.button>
+            </div>
+          )}
           
           {activeSection === 'contacts' && (
             <div className="flex flex-col sm:flex-row gap-3">
