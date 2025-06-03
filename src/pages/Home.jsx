@@ -49,9 +49,9 @@ const Home = ({ darkMode, toggleDarkMode }) => {
         {/* Navigation */}
         <nav className="flex-1 p-6">
           <ul className="space-y-2">
-            {navigation.map((item) => (
+{navigation.map((item) => (
               <motion.li key={item.id}>
-                <button
+                <motion.button
                   onClick={() => setActiveSection(item.id)}
                   className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all ${
                     activeSection === item.id
@@ -63,7 +63,7 @@ const Home = ({ darkMode, toggleDarkMode }) => {
                 >
                   <ApperIcon name={item.icon} className="w-5 h-5" />
                   <span className="font-medium">{item.label}</span>
-                </button>
+                </motion.button>
               </motion.li>
             ))}
           </ul>
