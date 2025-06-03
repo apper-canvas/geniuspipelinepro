@@ -48,9 +48,11 @@ const [showNotesModal, setShowNotesModal] = useState(false)
     { id: 3, name: 'Mike Johnson', username: 'mike.johnson', email: 'mike.johnson@company.com', role: 'Sales Representative' },
     { id: 4, name: 'Sarah Wilson', username: 'sarah.wilson', email: 'sarah.wilson@company.com', role: 'Legal Counsel' },
     { id: 5, name: 'David Chen', username: 'david.chen', email: 'david.chen@company.com', role: 'Marketing Manager' }
-  ])
+])
 const [draggedDeal, setDraggedDeal] = useState(null)
   const [showDealModal, setShowDealModal] = useState(false)
+  const [selectedDealDetail, setSelectedDealDetail] = useState(null)
+  const [showDealDetailModal, setShowDealDetailModal] = useState(false)
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -450,6 +452,7 @@ const handleAddContact = async (contactData) => {
       lastName: contact.lastName || '',
       email: contact.email || '',
 company: contact.company || '',
+      phone: contact.phone || '',
       position: contact.position || ''
     })
     setShowModal(true)
@@ -462,27 +465,31 @@ company: contact.company || '',
       await contactService.delete(contactId)
       toast.success('Contact deleted successfully')
       loadData()
+loadData()
     } catch (err) {
-toast.error(err?.message || 'Failed to delete contact')
+      toast.error(err?.message || 'Failed to delete contact')
     }
   }
-
 const handleContactClick = (contact) => {
     setSelectedContactDetail(contact)
     setShowContactDetailModal(true)
   }
 
-  const handleCompanyClick = (company) => {
+const handleCompanyClick = (company) => {
     setSelectedCompanyDetail(company)
     setShowCompanyDetailModal(true)
   }
 
-  const filteredContacts = contacts.filter(contact => {
+  const handleDealClick = (deal) => {
+    setSelectedDealDetail(deal)
+    setShowDealDetailModal(true)
+  }
+
+const filteredContacts = contacts.filter(contact => {
     const matchesSearch = `${contact.firstName} ${contact.lastName} ${contact.email} ${contact.company}`.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesFilter = selectedFilter === 'all' || contact.tags?.includes(selectedFilter)
     return matchesSearch && matchesFilter
   })
-
   const filteredCompanies = companies.filter(company => {
     const matchesSearch = `${company.name} ${company.industry} ${company.size}`.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesFilter = selectedFilter === 'all' || 
@@ -512,11 +519,11 @@ const handleContactClick = (contact) => {
         loadData()
       } catch (err) {
         toast.error('Failed to update deal')
+toast.error('Failed to update deal')
       }
-}
+    }
     setDraggedDeal(null)
   }
-  const handleDealSubmit = async (e) => {
     e.preventDefault()
     if (!dealFormData.title?.trim() || !dealFormData.value) {
       toast.error('Please fill in title and value fields')
@@ -1274,12 +1281,13 @@ onClick={() => {
                       </span>
                     </div>
                     <div className="space-y-3 max-h-96 overflow-y-auto scrollbar-hide">
-                      {deals?.filter(deal => deal?.stage === stage.id)?.map((deal) => (
+{deals?.filter(deal => deal?.stage === stage.id)?.map((deal) => (
                         <motion.div
                           key={deal.id}
                           draggable
                           onDragStart={(e) => handleDragStart(e, deal)}
-                          className="p-4 bg-surface-50 dark:bg-surface-700 rounded-xl border border-surface-200 dark:border-surface-600 cursor-move hover:shadow-lg transition-all"
+                          onClick={() => handleDealClick(deal)}
+                          className="p-4 bg-surface-50 dark:bg-surface-700 rounded-xl border border-surface-200 dark:border-surface-600 cursor-pointer hover:shadow-lg transition-all"
                           whileHover={{ scale: 1.02 }}
                         >
                           <h4 className="font-medium text-surface-900 dark:text-white mb-2">{deal?.title || 'Untitled Deal'}</h4>
@@ -1290,7 +1298,7 @@ onClick={() => {
                             <span className="text-surface-600 dark:text-surface-400">
                               {deal?.probability || 0}% chance
                             </span>
-<span className="text-surface-500">
+                            <span className="text-surface-500">
                               {deal?.expectedCloseDate ? format(new Date(deal.expectedCloseDate), 'MMM dd') : 'No date'}
                             </span>
                           </div>
@@ -2799,6 +2807,210 @@ onClick={() => {
                   >
                     <ApperIcon name="Trash2" className="w-4 h-4" />
                     <span>Delete Task</span>
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+</motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Deal Detail Modal */}
+      <AnimatePresence>
+        {showDealDetailModal && selectedDealDetail && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+            onClick={() => setShowDealDetailModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white dark:bg-surface-800 rounded-2xl border border-surface-200 dark:border-surface-700 p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-semibold text-surface-900 dark:text-white">
+                  Deal Details
+                </h3>
+                <button
+                  onClick={() => setShowDealDetailModal(false)}
+                  className="p-2 hover:bg-surface-100 dark:hover:bg-surface-700 rounded-lg transition-colors"
+                >
+                  <ApperIcon name="X" className="w-5 h-5 text-surface-500" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* Deal Header */}
+                <div className="flex items-center space-x-4 p-4 bg-surface-50 dark:bg-surface-700/50 rounded-xl">
+                  <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white font-bold text-xl">
+                    <ApperIcon name="DollarSign" className="w-8 h-8" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-xl font-semibold text-surface-900 dark:text-white">
+                      {selectedDealDetail?.title || 'Untitled Deal'}
+                    </h4>
+                    <p className="text-2xl font-bold text-primary">
+                      ${selectedDealDetail?.value?.toLocaleString() || '0'}
+                    </p>
+                    <div className="flex items-center space-x-2 mt-2">
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        selectedDealDetail?.stage === 'closed-won' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
+                        selectedDealDetail?.stage === 'closed-lost' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' :
+                        selectedDealDetail?.stage === 'negotiation' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300' :
+                        selectedDealDetail?.stage === 'proposal' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300' :
+                        selectedDealDetail?.stage === 'qualified' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' :
+                        'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300'
+                      }`}>
+                        {pipelineStages.find(stage => stage.id === selectedDealDetail?.stage)?.label || 'Unknown Stage'}
+                      </span>
+                      <span className="text-sm text-surface-600 dark:text-surface-400">
+                        {selectedDealDetail?.probability || 0}% probability
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Deal Information */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <h5 className="text-lg font-semibold text-surface-900 dark:text-white">Deal Information</h5>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="User" className="w-4 h-4 text-primary" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Contact</p>
+                          <p className="text-surface-900 dark:text-white">{selectedDealDetail?.contactId || 'No contact assigned'}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-secondary/10 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Calendar" className="w-4 h-4 text-secondary" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Expected Close Date</p>
+                          <p className="text-surface-900 dark:text-white">
+                            {selectedDealDetail?.expectedCloseDate ? format(new Date(selectedDealDetail.expectedCloseDate), 'PPP') : 'No date set'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="TrendingUp" className="w-4 h-4 text-accent" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Stage</p>
+                          <p className="text-surface-900 dark:text-white capitalize">
+                            {pipelineStages.find(stage => stage.id === selectedDealDetail?.stage)?.label || 'Unknown'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Target" className="w-4 h-4 text-green-600 dark:text-green-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Win Probability</p>
+                          <p className="text-surface-900 dark:text-white">{selectedDealDetail?.probability || 0}%</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h5 className="text-lg font-semibold text-surface-900 dark:text-white">Additional Details</h5>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Plus" className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Created</p>
+                          <p className="text-surface-900 dark:text-white">
+                            {selectedDealDetail?.createdAt ? format(new Date(selectedDealDetail.createdAt), 'PPP') : 'Unknown'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Edit" className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Last Updated</p>
+                          <p className="text-surface-900 dark:text-white">
+                            {selectedDealDetail?.updatedAt ? format(new Date(selectedDealDetail.updatedAt), 'PPP') : 'Never'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="DollarSign" className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Deal Value</p>
+                          <p className="text-surface-900 dark:text-white font-semibold">
+                            ${selectedDealDetail?.value?.toLocaleString() || '0'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Clock" className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Days to Close</p>
+                          <p className="text-surface-900 dark:text-white">
+                            {selectedDealDetail?.expectedCloseDate ? 
+                              Math.max(0, Math.ceil((new Date(selectedDealDetail.expectedCloseDate) - new Date()) / (1000 * 60 * 60 * 24))) + ' days' : 
+                              'No date set'
+                            }
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex justify-end space-x-3 pt-6 border-t border-surface-200 dark:border-surface-700">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      setSelectedEntity({ type: 'deal', data: selectedDealDetail })
+                      setShowNotesModal(true)
+                    }}
+                    className="px-6 py-2 border border-surface-300 dark:border-surface-600 text-surface-700 dark:text-surface-300 rounded-lg hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors flex items-center space-x-2"
+                  >
+                    <ApperIcon name="MessageSquare" className="w-4 h-4" />
+                    <span>View Notes</span>
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      setShowDealDetailModal(false)
+                      // Here you would implement deal editing functionality
+                      toast.info('Deal editing functionality coming soon')
+                    }}
+                    className="px-6 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg hover:shadow-lg transition-all duration-300 flex items-center space-x-2"
+                  >
+                    <ApperIcon name="Edit" className="w-4 h-4" />
+                    <span>Edit Deal</span>
                   </motion.button>
                 </div>
               </div>
