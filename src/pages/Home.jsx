@@ -13,6 +13,8 @@ const navigation = [
     { id: 'contacts', label: 'Contacts', icon: 'Users' },
     { id: 'companies', label: 'Companies', icon: 'Building2' },
     { id: 'pipeline', label: 'Pipeline', icon: 'TrendingUp' },
+    { id: 'quotes', label: 'Quotes', icon: 'FileText' },
+    { id: 'salesorders', label: 'Sales Orders', icon: 'ShoppingCart' },
     { id: 'tasks', label: 'Tasks', icon: 'CheckSquare' },
     { id: 'activities', label: 'Activities', icon: 'Activity' },
     { id: 'emails', label: 'Emails', icon: 'Mail' }

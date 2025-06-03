@@ -9,9 +9,11 @@ import { toast } from 'react-toastify'
 import Dashboard from './Dashboard'
 
 const MainFeature = ({ activeSection }) => {
-  const [contacts, setContacts] = useState([])
+const [contacts, setContacts] = useState([])
   const [companies, setCompanies] = useState([])
 const [deals, setDeals] = useState([])
+  const [quotes, setQuotes] = useState([])
+  const [salesOrders, setSalesOrders] = useState([])
   const [tasks, setTasks] = useState([])
   const [emails, setEmails] = useState([])
   const [loading, setLoading] = useState(false)
@@ -42,6 +44,14 @@ const [showNotesModal, setShowNotesModal] = useState(false)
   const [notes, setNotes] = useState([])
   const [showTaskDetailModal, setShowTaskDetailModal] = useState(false)
   const [selectedTaskDetail, setSelectedTaskDetail] = useState(null)
+  const [showQuoteModal, setShowQuoteModal] = useState(false)
+  const [showQuoteDetailModal, setShowQuoteDetailModal] = useState(false)
+  const [selectedQuoteDetail, setSelectedQuoteDetail] = useState(null)
+  const [editingQuote, setEditingQuote] = useState(null)
+  const [showSalesOrderModal, setShowSalesOrderModal] = useState(false)
+  const [showSalesOrderDetailModal, setShowSalesOrderDetailModal] = useState(false)
+  const [selectedSalesOrderDetail, setSelectedSalesOrderDetail] = useState(null)
+  const [editingSalesOrder, setEditingSalesOrder] = useState(null)
   const [teamMembers] = useState([
     { id: 1, name: 'John Smith', username: 'john.smith', email: 'john.smith@company.com', role: 'Sales Manager' },
     { id: 2, name: 'Jane Doe', username: 'jane.doe', email: 'jane.doe@company.com', role: 'Account Executive' },
@@ -62,6 +72,29 @@ const [draggedDeal, setDraggedDeal] = useState(null)
     company: '',
     position: ''
   })
+const [quoteFormData, setQuoteFormData] = useState({
+    title: '',
+    description: '',
+    amount: '',
+    contactId: '',
+    companyId: '',
+    status: 'draft',
+    validUntil: '',
+    items: []
+  })
+
+  const [salesOrderFormData, setSalesOrderFormData] = useState({
+    orderNumber: '',
+    title: '',
+    description: '',
+    amount: '',
+    contactId: '',
+    companyId: '',
+    status: 'pending',
+    expectedDelivery: '',
+    items: []
+  })
+
 useEffect(() => {
     if (activeSection === 'contacts') {
       loadContacts()
@@ -69,6 +102,10 @@ useEffect(() => {
       loadCompanies()
     } else if (activeSection === 'pipeline') {
       loadDeals()
+    } else if (activeSection === 'quotes') {
+      loadQuotes()
+    } else if (activeSection === 'salesorders') {
+      loadSalesOrders()
     } else if (activeSection === 'tasks') {
       loadTasks()
     } else if (activeSection === 'emails') {
@@ -127,13 +164,22 @@ const [taskFormData, setTaskFormData] = useState({
     expectedCloseDate: ''
 })
 
-  const pipelineStages = [
+const pipelineStages = [
     { id: 'lead', label: 'Lead', color: 'bg-gray-400' },
     { id: 'qualified', label: 'Qualified', color: 'bg-blue-400' },
     { id: 'proposal', label: 'Proposal', color: 'bg-yellow-400' },
     { id: 'negotiation', label: 'Negotiation', color: 'bg-orange-400' },
     { id: 'closed-won', label: 'Closed Won', color: 'bg-green-400' },
     { id: 'closed-lost', label: 'Closed Lost', color: 'bg-red-400' }
+  ]
+
+  const salesOrderStages = [
+    { id: 'pending', label: 'Pending', color: 'bg-yellow-400' },
+    { id: 'confirmed', label: 'Confirmed', color: 'bg-blue-400' },
+    { id: 'processing', label: 'Processing', color: 'bg-orange-400' },
+    { id: 'shipped', label: 'Shipped', color: 'bg-purple-400' },
+    { id: 'delivered', label: 'Delivered', color: 'bg-green-400' },
+    { id: 'cancelled', label: 'Cancelled', color: 'bg-red-400' }
   ]
   const loadContacts = async () => {
     try {
@@ -185,6 +231,101 @@ const [taskFormData, setTaskFormData] = useState({
     } finally {
       setLoading(false)
     }
+}
+
+  const loadQuotes = async () => {
+    try {
+      setLoading(true)
+      // Mock quotes data
+      const mockQuotes = [
+        {
+          id: 1,
+          title: 'Website Development Quote',
+          description: 'Complete website redesign and development',
+          amount: 15000,
+          contactId: 'john.doe@company.com',
+          companyId: 'Tech Corp',
+          status: 'sent',
+          validUntil: '2024-02-15',
+          createdAt: '2024-01-15T10:00:00Z',
+          items: [
+            { description: 'UI/UX Design', quantity: 1, unitPrice: 5000, total: 5000 },
+            { description: 'Frontend Development', quantity: 1, unitPrice: 7000, total: 7000 },
+            { description: 'Backend Development', quantity: 1, unitPrice: 3000, total: 3000 }
+          ]
+        },
+        {
+          id: 2,
+          title: 'Marketing Campaign Quote',
+          description: 'Q1 digital marketing campaign',
+          amount: 8500,
+          contactId: 'jane.smith@business.com',
+          companyId: 'Business Solutions Inc',
+          status: 'draft',
+          validUntil: '2024-02-20',
+          createdAt: '2024-01-20T14:30:00Z',
+          items: [
+            { description: 'SEO Optimization', quantity: 1, unitPrice: 3500, total: 3500 },
+            { description: 'Social Media Management', quantity: 3, unitPrice: 1000, total: 3000 },
+            { description: 'Content Creation', quantity: 1, unitPrice: 2000, total: 2000 }
+          ]
+        }
+      ]
+      setQuotes(mockQuotes)
+    } catch (error) {
+      console.error('Error loading quotes:', error)
+      toast.error('Failed to load quotes')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const loadSalesOrders = async () => {
+    try {
+      setLoading(true)
+      // Mock sales orders data
+      const mockSalesOrders = [
+        {
+          id: 1,
+          orderNumber: 'SO-2024-001',
+          title: 'Software License Order',
+          description: 'Annual software licenses for team',
+          amount: 12000,
+          contactId: 'admin@techcorp.com',
+          companyId: 'Tech Corp',
+          status: 'confirmed',
+          expectedDelivery: '2024-02-10',
+          createdAt: '2024-01-10T09:00:00Z',
+          items: [
+            { description: 'Pro License', quantity: 10, unitPrice: 1000, total: 10000 },
+            { description: 'Support Package', quantity: 1, unitPrice: 2000, total: 2000 }
+          ]
+        },
+        {
+          id: 2,
+          orderNumber: 'SO-2024-002',
+          title: 'Hardware Equipment Order',
+          description: 'Office equipment for new team',
+          amount: 25000,
+          contactId: 'procurement@business.com',
+          companyId: 'Business Solutions Inc',
+          status: 'processing',
+          expectedDelivery: '2024-02-25',
+          createdAt: '2024-01-18T11:15:00Z',
+          items: [
+            { description: 'Laptops', quantity: 5, unitPrice: 2000, total: 10000 },
+            { description: 'Monitors', quantity: 10, unitPrice: 500, total: 5000 },
+            { description: 'Accessories', quantity: 1, unitPrice: 10000, total: 10000 }
+          ]
+        }
+      ]
+      setSalesOrders(mockSalesOrders)
+    } catch (error) {
+      console.error('Error loading sales orders:', error)
+      toast.error('Failed to load sales orders')
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(() => {
@@ -201,6 +342,10 @@ const loadData = async () => {
       } else if (activeSection === 'pipeline') {
         const result = await dealService.getAll()
         setDeals(result || [])
+      } else if (activeSection === 'quotes') {
+        loadQuotes()
+      } else if (activeSection === 'salesorders') {
+        loadSalesOrders()
       } else if (activeSection === 'tasks') {
         const result = await taskService.getAll()
         setTasks(result || [])
@@ -657,11 +802,155 @@ const handleAddNote = async (noteData) => {
     }
   }
 
-  if (activeSection === 'dashboard') {
+const handleQuoteClick = (quote) => {
+    setSelectedQuoteDetail(quote)
+    setShowQuoteDetailModal(true)
+  }
+
+  const handleSalesOrderClick = (salesOrder) => {
+    setSelectedSalesOrderDetail(salesOrder)
+    setShowSalesOrderDetailModal(true)
+  }
+
+  const handleQuoteSubmit = async (e) => {
+    e.preventDefault()
+    if (!quoteFormData.title?.trim() || !quoteFormData.amount) {
+      toast.error('Please fill in title and amount fields')
+      return
+    }
+
+    try {
+      setLoading(true)
+      const quoteData = {
+        ...quoteFormData,
+        amount: parseFloat(quoteFormData.amount),
+        id: editingQuote ? editingQuote.id : Date.now(),
+        createdAt: editingQuote ? editingQuote.createdAt : new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+      
+      if (editingQuote) {
+        setQuotes(quotes.map(q => q.id === editingQuote.id ? quoteData : q))
+        toast.success('Quote updated successfully')
+      } else {
+        setQuotes([...quotes, quoteData])
+        toast.success('Quote created successfully')
+      }
+      
+      setShowQuoteModal(false)
+      setQuoteFormData({
+        title: '',
+        description: '',
+        amount: '',
+        contactId: '',
+        companyId: '',
+        status: 'draft',
+        validUntil: '',
+        items: []
+      })
+      setEditingQuote(null)
+    } catch (err) {
+      toast.error(err?.message || 'Failed to save quote')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSalesOrderSubmit = async (e) => {
+    e.preventDefault()
+    if (!salesOrderFormData.title?.trim() || !salesOrderFormData.amount) {
+      toast.error('Please fill in title and amount fields')
+      return
+    }
+
+    try {
+      setLoading(true)
+      const orderData = {
+        ...salesOrderFormData,
+        amount: parseFloat(salesOrderFormData.amount),
+        id: editingSalesOrder ? editingSalesOrder.id : Date.now(),
+        orderNumber: editingSalesOrder ? editingSalesOrder.orderNumber : `SO-2024-${String(salesOrders.length + 1).padStart(3, '0')}`,
+        createdAt: editingSalesOrder ? editingSalesOrder.createdAt : new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+      
+      if (editingSalesOrder) {
+        setSalesOrders(salesOrders.map(so => so.id === editingSalesOrder.id ? orderData : so))
+        toast.success('Sales order updated successfully')
+      } else {
+        setSalesOrders([...salesOrders, orderData])
+        toast.success('Sales order created successfully')
+      }
+      
+      setShowSalesOrderModal(false)
+      setSalesOrderFormData({
+        orderNumber: '',
+        title: '',
+        description: '',
+        amount: '',
+        contactId: '',
+        companyId: '',
+        status: 'pending',
+        expectedDelivery: '',
+        items: []
+      })
+      setEditingSalesOrder(null)
+    } catch (err) {
+      toast.error(err?.message || 'Failed to save sales order')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleQuoteDelete = async (quoteId) => {
+    if (!window.confirm('Are you sure you want to delete this quote?')) return
+    
+    try {
+      setQuotes(quotes.filter(q => q.id !== quoteId))
+      toast.success('Quote deleted successfully')
+    } catch (err) {
+      toast.error('Failed to delete quote')
+    }
+  }
+
+  const handleSalesOrderDelete = async (orderId) => {
+    if (!window.confirm('Are you sure you want to delete this sales order?')) return
+    
+    try {
+      setSalesOrders(salesOrders.filter(so => so.id !== orderId))
+      toast.success('Sales order deleted successfully')
+    } catch (err) {
+      toast.error('Failed to delete sales order')
+    }
+  }
+
+  const handleConvertQuoteToDeal = async (quote) => {
+    try {
+      const dealData = {
+        id: Date.now(),
+        title: quote.title,
+        value: quote.amount,
+        contactId: quote.contactId,
+        stage: 'proposal',
+        probability: 75,
+        expectedCloseDate: quote.validUntil,
+        createdAt: new Date().toISOString()
+      }
+      
+      setDeals([...deals, dealData])
+      toast.success('Quote converted to deal successfully')
+      setShowQuoteDetailModal(false)
+    } catch (err) {
+      toast.error('Failed to convert quote to deal')
+    }
+  }
+
+if (activeSection === 'dashboard') {
     return <Dashboard />
   }
-    if (activeSection === 'companies') {
-      return (
+  
+  if (activeSection === 'companies') {
+    return (
         <div className="p-6">
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
@@ -1046,6 +1335,524 @@ const handleAddNote = async (noteData) => {
               </motion.div>
             </div>
           )}
+</div>
+      )
+    }
+    if (activeSection === 'quotes') {
+      return (
+        <div className="p-6">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+            <div>
+              <h1 className="text-3xl font-bold text-surface-900 dark:text-white">Quotes</h1>
+              <p className="text-surface-600 dark:text-surface-400 mt-1">Manage your quote proposals</p>
+            </div>
+            <motion.button
+              onClick={() => {
+                setEditingQuote(null)
+                setQuoteFormData({
+                  title: '',
+                  description: '',
+                  amount: '',
+                  contactId: '',
+                  companyId: '',
+                  status: 'draft',
+                  validUntil: '',
+                  items: []
+                })
+                setShowQuoteModal(true)
+              }}
+              className="mt-4 sm:mt-0 flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-xl hover:shadow-lg transition-all"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <ApperIcon name="Plus" className="w-4 h-4" />
+              <span>New Quote</span>
+            </motion.button>
+          </div>
+
+          {/* Search and Filters */}
+          <div className="flex flex-col sm:flex-row gap-4 mb-6">
+            <div className="flex-1 relative">
+              <ApperIcon name="Search" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-surface-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Search quotes..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+            </div>
+            <select
+              value={selectedFilter}
+              onChange={(e) => setSelectedFilter(e.target.value)}
+              className="px-4 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+            >
+              <option value="all">All Status</option>
+              <option value="draft">Draft</option>
+              <option value="sent">Sent</option>
+              <option value="accepted">Accepted</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+
+          {/* Quotes Grid */}
+          {loading ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {quotes.map((quote) => (
+                <motion.div
+                  key={quote.id}
+                  className="bg-white dark:bg-surface-800 p-6 rounded-2xl shadow-card border border-surface-200 dark:border-surface-700 cursor-pointer"
+                  whileHover={{ scale: 1.02 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  onClick={() => handleQuoteClick(quote)}
+                >
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-semibold text-surface-900 dark:text-white">{quote.title}</h3>
+                      <p className="text-surface-600 dark:text-surface-400 text-sm">{quote.description}</p>
+                    </div>
+                    <span className={`px-2 py-1 rounded-lg text-xs font-medium ${
+                      quote.status === 'draft' ? 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300' :
+                      quote.status === 'sent' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' :
+                      quote.status === 'accepted' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
+                      'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                    }`}>
+                      {quote.status}
+                    </span>
+                  </div>
+                  
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl font-bold text-primary">${quote.amount?.toLocaleString()}</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm text-surface-600 dark:text-surface-400">
+                      <ApperIcon name="User" className="w-4 h-4" />
+                      <span>{quote.contactId}</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm text-surface-600 dark:text-surface-400">
+                      <ApperIcon name="Building2" className="w-4 h-4" />
+                      <span>{quote.companyId}</span>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm text-surface-600 dark:text-surface-400">
+                      <ApperIcon name="Calendar" className="w-4 h-4" />
+                      <span>Valid until: {quote.validUntil ? format(new Date(quote.validUntil), 'MMM dd, yyyy') : 'No expiry'}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setEditingQuote(quote)
+                        setQuoteFormData({
+                          title: quote.title,
+                          description: quote.description,
+                          amount: quote.amount.toString(),
+                          contactId: quote.contactId,
+                          companyId: quote.companyId,
+                          status: quote.status,
+                          validUntil: quote.validUntil,
+                          items: quote.items || []
+                        })
+                        setShowQuoteModal(true)
+                      }}
+                      className="flex-1 flex items-center justify-center space-x-1 px-3 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
+                    >
+                      <ApperIcon name="Edit" className="w-4 h-4" />
+                      <span className="text-sm">Edit</span>
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleQuoteDelete(quote.id)
+                      }}
+                      className="flex-1 flex items-center justify-center space-x-1 px-3 py-2 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
+                    >
+                      <ApperIcon name="Trash2" className="w-4 h-4" />
+                      <span className="text-sm">Delete</span>
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          )}
+
+          {/* Quote Modal */}
+          {showQuoteModal && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+              <motion.div
+                className="bg-white dark:bg-surface-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-surface-900 dark:text-white">
+                    {editingQuote ? 'Edit Quote' : 'Create New Quote'}
+                  </h2>
+                  <button
+                    onClick={() => {
+                      setShowQuoteModal(false)
+                      setEditingQuote(null)
+                    }}
+                    className="p-2 hover:bg-surface-100 dark:hover:bg-surface-700 rounded-xl transition-colors"
+                  >
+                    <ApperIcon name="X" className="w-5 h-5 text-surface-500" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleQuoteSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                      Quote Title *
+                    </label>
+                    <input
+                      type="text"
+                      value={quoteFormData.title}
+                      onChange={(e) => setQuoteFormData({ ...quoteFormData, title: e.target.value })}
+                      required
+                      className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                      Description
+                    </label>
+                    <textarea
+                      value={quoteFormData.description}
+                      onChange={(e) => setQuoteFormData({ ...quoteFormData, description: e.target.value })}
+                      rows="3"
+                      className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                        Amount *
+                      </label>
+                      <input
+                        type="number"
+                        value={quoteFormData.amount}
+                        onChange={(e) => setQuoteFormData({ ...quoteFormData, amount: e.target.value })}
+                        required
+                        step="0.01"
+                        className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                        Status
+                      </label>
+                      <select
+                        value={quoteFormData.status}
+                        onChange={(e) => setQuoteFormData({ ...quoteFormData, status: e.target.value })}
+                        className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      >
+                        <option value="draft">Draft</option>
+                        <option value="sent">Sent</option>
+                        <option value="accepted">Accepted</option>
+                        <option value="rejected">Rejected</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                        Contact
+                      </label>
+                      <input
+                        type="text"
+                        value={quoteFormData.contactId}
+                        onChange={(e) => setQuoteFormData({ ...quoteFormData, contactId: e.target.value })}
+                        className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                        Company
+                      </label>
+                      <input
+                        type="text"
+                        value={quoteFormData.companyId}
+                        onChange={(e) => setQuoteFormData({ ...quoteFormData, companyId: e.target.value })}
+                        className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                      Valid Until
+                    </label>
+                    <input
+                      type="date"
+                      value={quoteFormData.validUntil}
+                      onChange={(e) => setQuoteFormData({ ...quoteFormData, validUntil: e.target.value })}
+                      className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    />
+                  </div>
+
+                  <div className="flex space-x-3 pt-4">
+                    <button
+                      type="submit"
+                      className="flex-1 bg-gradient-to-r from-primary to-secondary text-white py-2 px-4 rounded-xl hover:shadow-lg transition-all"
+                    >
+                      {editingQuote ? 'Update Quote' : 'Create Quote'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowQuoteModal(false)
+                        setEditingQuote(null)
+                      }}
+                      className="flex-1 bg-surface-200 dark:bg-surface-700 text-surface-700 dark:text-surface-300 py-2 px-4 rounded-xl hover:bg-surface-300 dark:hover:bg-surface-600 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </motion.div>
+            </div>
+          )}
+        </div>
+      )
+    }
+
+    if (activeSection === 'salesorders') {
+      return (
+        <div className="p-6">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+            <div>
+              <h1 className="text-3xl font-bold text-surface-900 dark:text-white">Sales Orders</h1>
+              <p className="text-surface-600 dark:text-surface-400 mt-1">Track and manage sales orders</p>
+            </div>
+            <motion.button
+              onClick={() => {
+                setEditingSalesOrder(null)
+                setSalesOrderFormData({
+                  orderNumber: '',
+                  title: '',
+                  description: '',
+                  amount: '',
+                  contactId: '',
+                  companyId: '',
+                  status: 'pending',
+                  expectedDelivery: '',
+                  items: []
+                })
+                setShowSalesOrderModal(true)
+              }}
+              className="mt-4 sm:mt-0 flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-xl hover:shadow-lg transition-all"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <ApperIcon name="Plus" className="w-4 h-4" />
+              <span>New Sales Order</span>
+            </motion.button>
+          </div>
+
+          {/* Sales Order Pipeline */}
+          {loading ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6 h-full overflow-x-auto">
+              {salesOrderStages.map((stage) => (
+                <div
+                  key={stage.id}
+                  className="bg-white/80 dark:bg-surface-800/80 backdrop-blur-xl rounded-2xl border border-surface-200 dark:border-surface-700 p-4 min-w-80 sm:min-w-0"
+                >
+                  <div className="flex items-center space-x-2 mb-4">
+                    <div className={`w-3 h-3 rounded-full ${stage.color}`}></div>
+                    <h3 className="font-semibold text-surface-900 dark:text-white">{stage.label}</h3>
+                    <span className="text-xs text-surface-500 bg-surface-100 dark:bg-surface-700 px-2 py-1 rounded-full">
+                      {salesOrders?.filter(order => order?.status === stage.id)?.length || 0}
+                    </span>
+                  </div>
+                  <div className="space-y-3 max-h-96 overflow-y-auto scrollbar-hide">
+                    {salesOrders?.filter(order => order?.status === stage.id)?.map((order) => (
+                      <motion.div
+                        key={order.id}
+                        onClick={() => handleSalesOrderClick(order)}
+                        className="p-4 bg-surface-50 dark:bg-surface-700 rounded-xl border border-surface-200 dark:border-surface-600 cursor-pointer hover:shadow-lg transition-all"
+                        whileHover={{ scale: 1.02 }}
+                      >
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-medium text-surface-900 dark:text-white text-sm">{order?.orderNumber}</h4>
+                          <span className="text-xs text-surface-500 bg-surface-200 dark:bg-surface-600 px-2 py-1 rounded">
+                            {order?.status}
+                          </span>
+                        </div>
+                        <h5 className="font-medium text-surface-900 dark:text-white mb-2">{order?.title || 'Untitled Order'}</h5>
+                        <p className="text-lg font-bold text-primary mb-2">
+                          ${order?.amount?.toLocaleString() || '0'}
+                        </p>
+                        <div className="text-sm text-surface-600 dark:text-surface-400">
+                          <p className="truncate">{order?.contactId}</p>
+                          <p className="truncate">{order?.companyId}</p>
+                          {order?.expectedDelivery && (
+                            <p>Due: {format(new Date(order.expectedDelivery), 'MMM dd')}</p>
+                          )}
+                        </div>
+                      </motion.div>
+                    )) || []}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Sales Order Modal */}
+          {showSalesOrderModal && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+              <motion.div
+                className="bg-white dark:bg-surface-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+              >
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-surface-900 dark:text-white">
+                    {editingSalesOrder ? 'Edit Sales Order' : 'Create New Sales Order'}
+                  </h2>
+                  <button
+                    onClick={() => {
+                      setShowSalesOrderModal(false)
+                      setEditingSalesOrder(null)
+                    }}
+                    className="p-2 hover:bg-surface-100 dark:hover:bg-surface-700 rounded-xl transition-colors"
+                  >
+                    <ApperIcon name="X" className="w-5 h-5 text-surface-500" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleSalesOrderSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                      Order Title *
+                    </label>
+                    <input
+                      type="text"
+                      value={salesOrderFormData.title}
+                      onChange={(e) => setSalesOrderFormData({ ...salesOrderFormData, title: e.target.value })}
+                      required
+                      className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                      Description
+                    </label>
+                    <textarea
+                      value={salesOrderFormData.description}
+                      onChange={(e) => setSalesOrderFormData({ ...salesOrderFormData, description: e.target.value })}
+                      rows="3"
+                      className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                        Amount *
+                      </label>
+                      <input
+                        type="number"
+                        value={salesOrderFormData.amount}
+                        onChange={(e) => setSalesOrderFormData({ ...salesOrderFormData, amount: e.target.value })}
+                        required
+                        step="0.01"
+                        className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                        Status
+                      </label>
+                      <select
+                        value={salesOrderFormData.status}
+                        onChange={(e) => setSalesOrderFormData({ ...salesOrderFormData, status: e.target.value })}
+                        className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      >
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="processing">Processing</option>
+                        <option value="shipped">Shipped</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="cancelled">Cancelled</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                        Contact
+                      </label>
+                      <input
+                        type="text"
+                        value={salesOrderFormData.contactId}
+                        onChange={(e) => setSalesOrderFormData({ ...salesOrderFormData, contactId: e.target.value })}
+                        className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                        Company
+                      </label>
+                      <input
+                        type="text"
+                        value={salesOrderFormData.companyId}
+                        onChange={(e) => setSalesOrderFormData({ ...salesOrderFormData, companyId: e.target.value })}
+                        className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                      Expected Delivery
+                    </label>
+                    <input
+                      type="date"
+                      value={salesOrderFormData.expectedDelivery}
+                      onChange={(e) => setSalesOrderFormData({ ...salesOrderFormData, expectedDelivery: e.target.value })}
+                      className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    />
+                  </div>
+
+                  <div className="flex space-x-3 pt-4">
+                    <button
+                      type="submit"
+                      className="flex-1 bg-gradient-to-r from-primary to-secondary text-white py-2 px-4 rounded-xl hover:shadow-lg transition-all"
+                    >
+                      {editingSalesOrder ? 'Update Order' : 'Create Order'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowSalesOrderModal(false)
+                        setEditingSalesOrder(null)
+                      }}
+                      className="flex-1 bg-surface-200 dark:bg-surface-700 text-surface-700 dark:text-surface-300 py-2 px-4 rounded-xl hover:bg-surface-300 dark:hover:bg-surface-600 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </motion.div>
+            </div>
+          )}
         </div>
       )
     }
@@ -1094,6 +1901,8 @@ if (loading) {
 {activeSection === 'tasks' && 'Stay on top of your to-do list'}
               {activeSection === 'activities' && 'View all customer interactions'}
               {activeSection === 'emails' && 'Manage email communications'}
+              {activeSection === 'quotes' && 'Create and manage quote proposals'}
+              {activeSection === 'salesorders' && 'Track and manage sales orders'}
             </p>
           </div>
           
@@ -3035,9 +3844,438 @@ onClick={() => {
             </motion.div>
           </motion.div>
         )}
+</AnimatePresence>
+
+      {/* Quote Detail Modal */}
+      <AnimatePresence>
+        {showQuoteDetailModal && selectedQuoteDetail && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+            onClick={() => setShowQuoteDetailModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white dark:bg-surface-800 rounded-2xl border border-surface-200 dark:border-surface-700 p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-semibold text-surface-900 dark:text-white">
+                  Quote Details
+                </h3>
+                <button
+                  onClick={() => setShowQuoteDetailModal(false)}
+                  className="p-2 hover:bg-surface-100 dark:hover:bg-surface-700 rounded-lg transition-colors"
+                >
+                  <ApperIcon name="X" className="w-5 h-5 text-surface-500" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* Quote Header */}
+                <div className="flex items-center space-x-4 p-4 bg-surface-50 dark:bg-surface-700/50 rounded-xl">
+                  <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center text-white font-bold text-xl">
+                    <ApperIcon name="FileText" className="w-8 h-8" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-xl font-semibold text-surface-900 dark:text-white">
+                      {selectedQuoteDetail?.title || 'Unknown Quote'}
+                    </h4>
+                    <p className="text-surface-600 dark:text-surface-400">
+                      {selectedQuoteDetail?.description || 'No description provided'}
+                    </p>
+                    <div className="flex items-center space-x-2 mt-2">
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        selectedQuoteDetail?.status === 'draft' ? 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300' :
+                        selectedQuoteDetail?.status === 'sent' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' :
+                        selectedQuoteDetail?.status === 'accepted' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
+                        'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                      }`}>
+                        {selectedQuoteDetail?.status}
+                      </span>
+                      <span className="text-2xl font-bold text-primary">
+                        ${selectedQuoteDetail?.amount?.toLocaleString() || '0'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quote Information */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <h5 className="text-lg font-semibold text-surface-900 dark:text-white">Quote Information</h5>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="User" className="w-4 h-4 text-primary" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Contact</p>
+                          <p className="text-surface-900 dark:text-white">{selectedQuoteDetail?.contactId || 'No contact'}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-secondary/10 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Building2" className="w-4 h-4 text-secondary" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Company</p>
+                          <p className="text-surface-900 dark:text-white">{selectedQuoteDetail?.companyId || 'No company'}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Calendar" className="w-4 h-4 text-accent" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Valid Until</p>
+                          <p className="text-surface-900 dark:text-white">
+                            {selectedQuoteDetail?.validUntil ? format(new Date(selectedQuoteDetail.validUntil), 'PPP') : 'No expiry date'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h5 className="text-lg font-semibold text-surface-900 dark:text-white">Additional Details</h5>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Plus" className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Created</p>
+                          <p className="text-surface-900 dark:text-white">
+                            {selectedQuoteDetail?.createdAt ? format(new Date(selectedQuoteDetail.createdAt), 'PPP') : 'Unknown'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="DollarSign" className="w-4 h-4 text-green-600 dark:text-green-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Quote Amount</p>
+                          <p className="text-surface-900 dark:text-white font-semibold">
+                            ${selectedQuoteDetail?.amount?.toLocaleString() || '0'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Clock" className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Days Remaining</p>
+                          <p className="text-surface-900 dark:text-white">
+                            {selectedQuoteDetail?.validUntil ? 
+                              Math.max(0, Math.ceil((new Date(selectedQuoteDetail.validUntil) - new Date()) / (1000 * 60 * 60 * 24))) + ' days' : 
+                              'No expiry'
+                            }
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quote Items */}
+                {selectedQuoteDetail?.items && selectedQuoteDetail.items.length > 0 && (
+                  <div className="space-y-4">
+                    <h5 className="text-lg font-semibold text-surface-900 dark:text-white">Quote Items</h5>
+                    <div className="bg-surface-50 dark:bg-surface-700/50 rounded-xl p-4">
+                      <div className="space-y-3">
+                        {selectedQuoteDetail.items.map((item, index) => (
+                          <div key={index} className="flex items-center justify-between p-3 bg-white dark:bg-surface-800 rounded-lg">
+                            <div className="flex-1">
+                              <p className="font-medium text-surface-900 dark:text-white">{item.description}</p>
+                              <p className="text-sm text-surface-600 dark:text-surface-400">
+                                Qty: {item.quantity} × ${item.unitPrice?.toLocaleString()}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-semibold text-surface-900 dark:text-white">${item.total?.toLocaleString()}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="flex justify-end space-x-3 pt-6 border-t border-surface-200 dark:border-surface-700">
+                  {selectedQuoteDetail?.status === 'accepted' && (
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleConvertQuoteToDeal(selectedQuoteDetail)}
+                      className="px-6 py-2 bg-green-600 text-white rounded-lg hover:shadow-lg transition-all duration-300 flex items-center space-x-2"
+                    >
+                      <ApperIcon name="ArrowRight" className="w-4 h-4" />
+                      <span>Convert to Deal</span>
+                    </motion.button>
+                  )}
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      setShowQuoteDetailModal(false)
+                      setEditingQuote(selectedQuoteDetail)
+                      setQuoteFormData({
+                        title: selectedQuoteDetail.title,
+                        description: selectedQuoteDetail.description,
+                        amount: selectedQuoteDetail.amount.toString(),
+                        contactId: selectedQuoteDetail.contactId,
+                        companyId: selectedQuoteDetail.companyId,
+                        status: selectedQuoteDetail.status,
+                        validUntil: selectedQuoteDetail.validUntil,
+                        items: selectedQuoteDetail.items || []
+                      })
+                      setShowQuoteModal(true)
+                    }}
+                    className="px-6 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg hover:shadow-lg transition-all duration-300 flex items-center space-x-2"
+                  >
+                    <ApperIcon name="Edit" className="w-4 h-4" />
+                    <span>Edit Quote</span>
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Sales Order Detail Modal */}
+      <AnimatePresence>
+        {showSalesOrderDetailModal && selectedSalesOrderDetail && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+            onClick={() => setShowSalesOrderDetailModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white dark:bg-surface-800 rounded-2xl border border-surface-200 dark:border-surface-700 p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-semibold text-surface-900 dark:text-white">
+                  Sales Order Details
+                </h3>
+                <button
+                  onClick={() => setShowSalesOrderDetailModal(false)}
+                  className="p-2 hover:bg-surface-100 dark:hover:bg-surface-700 rounded-lg transition-colors"
+                >
+                  <ApperIcon name="X" className="w-5 h-5 text-surface-500" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* Sales Order Header */}
+                <div className="flex items-center space-x-4 p-4 bg-surface-50 dark:bg-surface-700/50 rounded-xl">
+                  <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center text-white font-bold text-xl">
+                    <ApperIcon name="ShoppingCart" className="w-8 h-8" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center space-x-3 mb-1">
+                      <h4 className="text-xl font-semibold text-surface-900 dark:text-white">
+                        {selectedSalesOrderDetail?.orderNumber}
+                      </h4>
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        selectedSalesOrderDetail?.status === 'pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300' :
+                        selectedSalesOrderDetail?.status === 'confirmed' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' :
+                        selectedSalesOrderDetail?.status === 'processing' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300' :
+                        selectedSalesOrderDetail?.status === 'shipped' ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300' :
+                        selectedSalesOrderDetail?.status === 'delivered' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
+                        'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                      }`}>
+                        {selectedSalesOrderDetail?.status}
+                      </span>
+                    </div>
+                    <h5 className="text-lg font-medium text-surface-900 dark:text-white mb-1">
+                      {selectedSalesOrderDetail?.title || 'Unknown Order'}
+                    </h5>
+                    <p className="text-surface-600 dark:text-surface-400">
+                      {selectedSalesOrderDetail?.description || 'No description provided'}
+                    </p>
+                    <p className="text-2xl font-bold text-primary mt-2">
+                      ${selectedSalesOrderDetail?.amount?.toLocaleString() || '0'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Sales Order Information */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <h5 className="text-lg font-semibold text-surface-900 dark:text-white">Order Information</h5>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="User" className="w-4 h-4 text-primary" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Contact</p>
+                          <p className="text-surface-900 dark:text-white">{selectedSalesOrderDetail?.contactId || 'No contact'}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-secondary/10 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Building2" className="w-4 h-4 text-secondary" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Company</p>
+                          <p className="text-surface-900 dark:text-white">{selectedSalesOrderDetail?.companyId || 'No company'}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Truck" className="w-4 h-4 text-accent" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Expected Delivery</p>
+                          <p className="text-surface-900 dark:text-white">
+                            {selectedSalesOrderDetail?.expectedDelivery ? format(new Date(selectedSalesOrderDetail.expectedDelivery), 'PPP') : 'No delivery date'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h5 className="text-lg font-semibold text-surface-900 dark:text-white">Additional Details</h5>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Plus" className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Created</p>
+                          <p className="text-surface-900 dark:text-white">
+                            {selectedSalesOrderDetail?.createdAt ? format(new Date(selectedSalesOrderDetail.createdAt), 'PPP') : 'Unknown'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="DollarSign" className="w-4 h-4 text-green-600 dark:text-green-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Order Amount</p>
+                          <p className="text-surface-900 dark:text-white font-semibold">
+                            ${selectedSalesOrderDetail?.amount?.toLocaleString() || '0'}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Clock" className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Days to Delivery</p>
+                          <p className="text-surface-900 dark:text-white">
+                            {selectedSalesOrderDetail?.expectedDelivery ? 
+                              Math.max(0, Math.ceil((new Date(selectedSalesOrderDetail.expectedDelivery) - new Date()) / (1000 * 60 * 60 * 24))) + ' days' : 
+                              'No delivery date'
+                            }
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Order Items */}
+                {selectedSalesOrderDetail?.items && selectedSalesOrderDetail.items.length > 0 && (
+                  <div className="space-y-4">
+                    <h5 className="text-lg font-semibold text-surface-900 dark:text-white">Order Items</h5>
+                    <div className="bg-surface-50 dark:bg-surface-700/50 rounded-xl p-4">
+                      <div className="space-y-3">
+                        {selectedSalesOrderDetail.items.map((item, index) => (
+                          <div key={index} className="flex items-center justify-between p-3 bg-white dark:bg-surface-800 rounded-lg">
+                            <div className="flex-1">
+                              <p className="font-medium text-surface-900 dark:text-white">{item.description}</p>
+                              <p className="text-sm text-surface-600 dark:text-surface-400">
+                                Qty: {item.quantity} × ${item.unitPrice?.toLocaleString()}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-semibold text-surface-900 dark:text-white">${item.total?.toLocaleString()}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="flex justify-end space-x-3 pt-6 border-t border-surface-200 dark:border-surface-700">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      setShowSalesOrderDetailModal(false)
+                      setEditingSalesOrder(selectedSalesOrderDetail)
+                      setSalesOrderFormData({
+                        orderNumber: selectedSalesOrderDetail.orderNumber,
+                        title: selectedSalesOrderDetail.title,
+                        description: selectedSalesOrderDetail.description,
+                        amount: selectedSalesOrderDetail.amount.toString(),
+                        contactId: selectedSalesOrderDetail.contactId,
+                        companyId: selectedSalesOrderDetail.companyId,
+                        status: selectedSalesOrderDetail.status,
+                        expectedDelivery: selectedSalesOrderDetail.expectedDelivery,
+                        items: selectedSalesOrderDetail.items || []
+                      })
+                      setShowSalesOrderModal(true)
+                    }}
+                    className="px-6 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg hover:shadow-lg transition-all duration-300 flex items-center space-x-2"
+                  >
+                    <ApperIcon name="Edit" className="w-4 h-4" />
+                    <span>Edit Order</span>
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      setShowSalesOrderDetailModal(false)
+                      handleSalesOrderDelete(selectedSalesOrderDetail.id)
+                    }}
+                    className="px-6 py-2 border border-red-300 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors flex items-center space-x-2"
+                  >
+                    <ApperIcon name="Trash2" className="w-4 h-4" />
+                    <span>Delete Order</span>
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
       </AnimatePresence>
     </div>
-  )
+)
 }
 
 // TaggingInput Component for team member mentions
