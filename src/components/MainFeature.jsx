@@ -2447,23 +2447,29 @@ onClick={() => {
                   <input
                     type="tel"
                     value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
                   />
                 </div>
 
-                <div>
+                <div className="flex justify-end space-x-3 pt-4">
+                  <button
+                    type="button"
                   <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
                     Company
                   </label>
-                  <input
-                    type="text"
+                  <select
                     value={formData.company}
                     onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                     className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-                  />
+                  >
+                    <option value="">Select company</option>
+                    {companies.map((company) => (
+                      <option key={company.id} value={company.name}>
+                        {company.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
                     Position
@@ -2486,7 +2492,7 @@ onClick={() => {
                   </button>
                   <button
                     type="submit"
-                    disabled={loading}
+disabled={loading}
                     className="px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg hover:shadow-lg transition-all duration-300 disabled:opacity-50"
                   >
                     {loading ? 'Saving...' : (selectedContact ? 'Update' : 'Create')}
@@ -2495,7 +2501,7 @@ onClick={() => {
               </form>
             </motion.div>
           </motion.div>
-)}
+        )}
       </AnimatePresence>
 
       {/* Notes Modal */}
