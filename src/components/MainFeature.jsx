@@ -1739,20 +1739,9 @@ onClick={() => {
                   )}
                 </div>
 
-                {/* Add Note Form */}
+{/* Add Note Form */}
                 <div className="border-t border-surface-200 dark:border-surface-700 pt-4">
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault()
-                      const formData = new FormData(e.target)
-                      const content = formData.get('content')
-                      if (content?.trim()) {
-                        handleAddNote({ content })
-                        e.target.reset()
-                      }
-                    }}
-className="space-y-3"
-                  >
+                  <div className="space-y-3">
                     <div>
                       <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
                         Add Internal Note
@@ -1766,16 +1755,7 @@ className="space-y-3"
                         }}
                       />
                     </div>
-                    <div className="flex justify-end">
-                      <button
-                        type="submit"
-                        className="px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg hover:shadow-lg transition-all duration-300 flex items-center space-x-2"
-                      >
-                        <ApperIcon name="Plus" className="w-4 h-4" />
-                        <span>Add Note</span>
-                      </button>
-                    </div>
-                  </form>
+                  </div>
                 </div>
               </div>
             </motion.div>
