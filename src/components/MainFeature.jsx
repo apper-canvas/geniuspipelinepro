@@ -754,9 +754,10 @@ const handleAddNote = async (noteData) => {
                     </div>
                   </div>
 
-                  <div className="flex space-x-2">
+<div className="flex space-x-2">
                     <button
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation()
                         setEditingCompany(company)
                         setShowCompanyModal(true)
                       }}
@@ -766,7 +767,10 @@ const handleAddNote = async (noteData) => {
                       <span className="text-sm">Edit</span>
                     </button>
                     <button
-                      onClick={() => handleDeleteCompany(company.id)}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleDeleteCompany(company.id)
+                      }}
                       className="flex-1 flex items-center justify-center space-x-1 px-3 py-2 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
                     >
                       <ApperIcon name="Trash2" className="w-4 h-4" />
