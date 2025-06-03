@@ -2444,16 +2444,15 @@ onClick={() => {
                   <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
                     Phone
                   </label>
-                  <input
+<input
                     type="tel"
                     value={formData.phone}
-className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
                   />
                 </div>
 
-                <div className="flex justify-end space-x-3 pt-4">
-                  <button
-                    type="button"
+                <div>
                   <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
                     Company
                   </label>
@@ -2470,6 +2469,7 @@ className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 ro
                     ))}
                   </select>
                 </div>
+
                 <div>
                   <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
                     Position
@@ -2492,10 +2492,10 @@ className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 ro
                   </button>
                   <button
                     type="submit"
-disabled={loading}
+                    disabled={loading}
                     className="px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg hover:shadow-lg transition-all duration-300 disabled:opacity-50"
                   >
-                    {loading ? 'Saving...' : (selectedContact ? 'Update' : 'Create')}
+{loading ? 'Saving...' : (selectedContact ? 'Update' : 'Create')}
                   </button>
                 </div>
               </form>
@@ -2503,7 +2503,6 @@ disabled={loading}
           </motion.div>
         )}
       </AnimatePresence>
-
       {/* Notes Modal */}
       <AnimatePresence>
         {showNotesModal && (
