@@ -33,7 +33,8 @@ const [deals, setDeals] = useState([])
   const [emailContent, setEmailContent] = useState({ to: '', subject: '', body: '' })
   const [emailSearchTerm, setEmailSearchTerm] = useState('')
   const [emailFilter, setEmailFilter] = useState('all')
-  const [draggedDeal, setDraggedDeal] = useState(null)
+const [draggedDeal, setDraggedDeal] = useState(null)
+  const [showDealModal, setShowDealModal] = useState(false)
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -82,17 +83,26 @@ const [taskFormData, setTaskFormData] = useState({
     to: '',
     subject: '',
     body: '',
+const [emailFormData, setEmailFormData] = useState({
+    to: '',
+    subject: '',
+    body: '',
     replyTo: null
+  })
+
+  const [dealFormData, setDealFormData] = useState({
+    title: '',
+    value: '',
+    contactId: '',
+    stage: 'lead',
+    probability: 50,
+    expectedCloseDate: ''
   })
 
   const pipelineStages = [
     { id: 'lead', label: 'Lead', color: 'bg-gray-400' },
     { id: 'qualified', label: 'Qualified', color: 'bg-blue-400' },
     { id: 'proposal', label: 'Proposal', color: 'bg-yellow-400' },
-    { id: 'negotiation', label: 'Negotiation', color: 'bg-orange-400' },
-    { id: 'closed-won', label: 'Closed Won', color: 'bg-green-400' },
-    { id: 'closed-lost', label: 'Closed Lost', color: 'bg-red-400' }
-  ]
 
   const loadContacts = async () => {
     try {
@@ -481,6 +491,42 @@ setShowModal(true)
       }
     }
     setDraggedDeal(null)
+setDraggedDeal(null)
+  }
+
+  const handleDealSubmit = async (e) => {
+    e.preventDefault()
+    if (!dealFormData.title?.trim() || !dealFormData.value) {
+      toast.error('Please fill in title and value fields')
+      return
+    }
+
+    try {
+      setLoading(true)
+      const dealData = {
+        ...dealFormData,
+        value: parseFloat(dealFormData.value),
+        probability: parseInt(dealFormData.probability),
+        createdAt: new Date().toISOString()
+      }
+      
+      await dealService.create(dealData)
+      toast.success('Deal created successfully')
+      setShowDealModal(false)
+      setDealFormData({
+        title: '',
+        value: '',
+        contactId: '',
+        stage: 'lead',
+        probability: 50,
+        expectedCloseDate: ''
+      })
+      loadData()
+    } catch (err) {
+      toast.error(err?.message || 'Failed to create deal')
+    } finally {
+      setLoading(false)
+    }
   }
 
 const getTaskPriority = (priority) => {
@@ -491,7 +537,6 @@ const getTaskPriority = (priority) => {
       default: return { color: 'text-surface-600 bg-surface-100', icon: 'Circle' }
     }
   }
-
   const getTaskStatus = (dueDate) => {
     if (!dueDate) return 'No due date'
     const date = new Date(dueDate)
@@ -954,9 +999,16 @@ if (loading) {
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => {
-                  // TODO: Implement deal creation modal
-                  console.log('Add new deal clicked')
+onClick={() => {
+                  setDealFormData({
+                    title: '',
+                    value: '',
+                    contactId: '',
+                    stage: 'lead',
+                    probability: 50,
+                    expectedCloseDate: ''
+                  })
+                  setShowDealModal(true)
                 }}
                 className="bg-gradient-to-r from-primary to-secondary text-white px-6 py-2 rounded-xl font-medium hover:shadow-lg transition-all duration-300 flex items-center space-x-2"
               >
@@ -1810,6 +1862,146 @@ if (loading) {
                   </motion.button>
                 </div>
               </div>
+            </motion.div>
+          </motion.div>
+        )}
+</AnimatePresence>
+
+      {/* Deal Modal */}
+      <AnimatePresence>
+        {showDealModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+            onClick={() => setShowDealModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white dark:bg-surface-800 rounded-2xl border border-surface-200 dark:border-surface-700 p-6 w-full max-w-md"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-semibold text-surface-900 dark:text-white">
+                  Add New Deal
+                </h3>
+                <button
+                  onClick={() => setShowDealModal(false)}
+                  className="p-2 hover:bg-surface-100 dark:hover:bg-surface-700 rounded-lg transition-colors"
+                >
+                  <ApperIcon name="X" className="w-5 h-5 text-surface-500" />
+                </button>
+              </div>
+
+              <form onSubmit={handleDealSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                    Deal Title *
+                  </label>
+                  <input
+                    type="text"
+                    value={dealFormData.title}
+                    onChange={(e) => setDealFormData({ ...dealFormData, title: e.target.value })}
+                    className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                    placeholder="Enter deal title"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                    Deal Value *
+                  </label>
+                  <input
+                    type="number"
+                    value={dealFormData.value}
+                    onChange={(e) => setDealFormData({ ...dealFormData, value: e.target.value })}
+                    className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                    placeholder="0"
+                    min="0"
+                    step="0.01"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                    Contact
+                  </label>
+                  <input
+                    type="text"
+                    value={dealFormData.contactId}
+                    onChange={(e) => setDealFormData({ ...dealFormData, contactId: e.target.value })}
+                    className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                    placeholder="Contact name or ID"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                      Stage
+                    </label>
+                    <select
+                      value={dealFormData.stage}
+                      onChange={(e) => setDealFormData({ ...dealFormData, stage: e.target.value })}
+                      className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                    >
+                      <option value="lead">Lead</option>
+                      <option value="qualified">Qualified</option>
+                      <option value="proposal">Proposal</option>
+                      <option value="negotiation">Negotiation</option>
+                      <option value="closed-won">Closed Won</option>
+                      <option value="closed-lost">Closed Lost</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                      Probability (%)
+                    </label>
+                    <input
+                      type="number"
+                      value={dealFormData.probability}
+                      onChange={(e) => setDealFormData({ ...dealFormData, probability: e.target.value })}
+                      className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                      min="0"
+                      max="100"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
+                    Expected Close Date
+                  </label>
+                  <input
+                    type="date"
+                    value={dealFormData.expectedCloseDate}
+                    onChange={(e) => setDealFormData({ ...dealFormData, expectedCloseDate: e.target.value })}
+                    className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                  />
+                </div>
+
+                <div className="flex justify-end space-x-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowDealModal(false)}
+                    className="px-4 py-2 border border-surface-300 dark:border-surface-600 text-surface-700 dark:text-surface-300 rounded-lg hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg hover:shadow-lg transition-all duration-300 disabled:opacity-50"
+                  >
+                    {loading ? 'Creating...' : 'Create Deal'}
+                  </button>
+                </div>
+              </form>
             </motion.div>
           </motion.div>
         )}
