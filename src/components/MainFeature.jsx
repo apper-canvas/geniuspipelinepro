@@ -462,10 +462,9 @@ company: contact.company || '',
     if (!window.confirm('Are you sure you want to delete this contact?')) return
     
     try {
-      await contactService.delete(contactId)
+await contactService.delete(contactId)
       toast.success('Contact deleted successfully')
       loadData()
-loadData()
     } catch (err) {
       toast.error(err?.message || 'Failed to delete contact')
     }
@@ -515,15 +514,16 @@ const filteredContacts = contacts.filter(contact => {
     if (draggedDeal && draggedDeal.stage !== targetStage) {
       try {
         await dealService.update(draggedDeal.id, { ...draggedDeal, stage: targetStage })
-        toast.success('Deal moved successfully')
+toast.success('Deal moved successfully')
         loadData()
       } catch (err) {
         toast.error('Failed to update deal')
-toast.error('Failed to update deal')
       }
     }
     setDraggedDeal(null)
   }
+
+  const handleDealSubmit = async (e) => {
     e.preventDefault()
     if (!dealFormData.title?.trim() || !dealFormData.value) {
       toast.error('Please fill in title and value fields')
