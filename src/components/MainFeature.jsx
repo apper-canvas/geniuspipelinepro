@@ -20,12 +20,14 @@ const [deals, setDeals] = useState([])
   const [showCompanyModal, setShowCompanyModal] = useState(false)
   const [showTaskModal, setShowTaskModal] = useState(false)
   const [showModal, setShowModal] = useState(false)
-  const [editingContact, setEditingContact] = useState(null)
+const [editingContact, setEditingContact] = useState(null)
   const [editingCompany, setEditingCompany] = useState(null)
 const [editingTask, setEditingTask] = useState(null)
   const [selectedContact, setSelectedContact] = useState(null)
   const [selectedContactDetail, setSelectedContactDetail] = useState(null)
   const [showContactDetailModal, setShowContactDetailModal] = useState(false)
+  const [selectedCompanyDetail, setSelectedCompanyDetail] = useState(null)
+  const [showCompanyDetailModal, setShowCompanyDetailModal] = useState(false)
   const [selectedTask, setSelectedTask] = useState(null)
   const [selectedEmail, setSelectedEmail] = useState(null)
 const [searchTerm, setSearchTerm] = useState('')
@@ -463,9 +465,14 @@ toast.error(err?.message || 'Failed to delete contact')
     }
   }
 
-  const handleContactClick = (contact) => {
+const handleContactClick = (contact) => {
     setSelectedContactDetail(contact)
     setShowContactDetailModal(true)
+  }
+
+  const handleCompanyClick = (company) => {
+    setSelectedCompanyDetail(company)
+    setShowCompanyDetailModal(true)
   }
 
   const filteredContacts = contacts.filter(contact => {
@@ -684,14 +691,15 @@ const handleAddNote = async (noteData) => {
               <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredCompanies.map((company) => (
                 <motion.div
                   key={company.id}
-                  className="bg-white dark:bg-surface-800 p-6 rounded-2xl shadow-card border border-surface-200 dark:border-surface-700"
+                  className="bg-white dark:bg-surface-800 p-6 rounded-2xl shadow-card border border-surface-200 dark:border-surface-700 cursor-pointer"
                   whileHover={{ scale: 1.02 }}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
+                  onClick={() => handleCompanyClick(company)}
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
@@ -2408,6 +2416,193 @@ onClick={() => {
                   >
                     <ApperIcon name="MessageSquare" className="w-4 h-4" />
                     <span>View Notes</span>
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+</motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Company Detail Modal */}
+      <AnimatePresence>
+        {showCompanyDetailModal && selectedCompanyDetail && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+            onClick={() => setShowCompanyDetailModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white dark:bg-surface-800 rounded-2xl border border-surface-200 dark:border-surface-700 p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-semibold text-surface-900 dark:text-white">
+                  Company Details
+                </h3>
+                <button
+                  onClick={() => setShowCompanyDetailModal(false)}
+                  className="p-2 hover:bg-surface-100 dark:hover:bg-surface-700 rounded-lg transition-colors"
+                >
+                  <ApperIcon name="X" className="w-5 h-5 text-surface-500" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* Company Header */}
+                <div className="flex items-center space-x-4 p-4 bg-surface-50 dark:bg-surface-700/50 rounded-xl">
+                  <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center text-white font-bold text-xl">
+                    {selectedCompanyDetail?.name?.charAt(0)?.toUpperCase() || 'C'}
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="text-xl font-semibold text-surface-900 dark:text-white">
+                      {selectedCompanyDetail?.name || 'Unknown Company'}
+                    </h4>
+                    <p className="text-surface-600 dark:text-surface-400">
+                      {selectedCompanyDetail?.industry || 'No industry specified'}
+                    </p>
+                    <span className={`inline-block px-2 py-1 rounded-lg text-xs font-medium mt-1 ${
+                      selectedCompanyDetail?.size === 'Small' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' :
+                      selectedCompanyDetail?.size === 'Medium' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
+                      selectedCompanyDetail?.size === 'Large' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300' :
+                      'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
+                    }`}>
+                      {selectedCompanyDetail?.size || 'Unknown'} Company
+                    </span>
+                  </div>
+                </div>
+
+                {/* Company Information */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <h5 className="text-lg font-semibold text-surface-900 dark:text-white">Contact Information</h5>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Mail" className="w-4 h-4 text-primary" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Email</p>
+                          <p className="text-surface-900 dark:text-white">{selectedCompanyDetail?.email || 'No email'}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-secondary/10 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Phone" className="w-4 h-4 text-secondary" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Phone</p>
+                          <p className="text-surface-900 dark:text-white">{selectedCompanyDetail?.phone || 'No phone'}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-accent/10 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Globe" className="w-4 h-4 text-accent" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Website</p>
+                          <p className="text-surface-900 dark:text-white">{selectedCompanyDetail?.website || 'No website'}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Users" className="w-4 h-4 text-green-600 dark:text-green-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Employees</p>
+                          <p className="text-surface-900 dark:text-white">{selectedCompanyDetail?.employees || 'Unknown'}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h5 className="text-lg font-semibold text-surface-900 dark:text-white">Company Details</h5>
+                    
+                    <div className="space-y-3">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="MapPin" className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Address</p>
+                          <p className="text-surface-900 dark:text-white">
+                            {selectedCompanyDetail?.address ? 
+                              `${selectedCompanyDetail.address.city}, ${selectedCompanyDetail.address.state} ${selectedCompanyDetail.address.zipCode}` : 
+                              'No address'
+                            }
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="DollarSign" className="w-4 h-4 text-orange-600 dark:text-orange-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Revenue</p>
+                          <p className="text-surface-900 dark:text-white">{selectedCompanyDetail?.revenue || 'Not specified'}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Calendar" className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Founded</p>
+                          <p className="text-surface-900 dark:text-white">{selectedCompanyDetail?.founded || 'Unknown'}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-3">
+                        <div className="w-8 h-8 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center">
+                          <ApperIcon name="Clock" className="w-4 h-4 text-red-600 dark:text-red-400" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-surface-500 dark:text-surface-400">Added</p>
+                          <p className="text-surface-900 dark:text-white">
+                            {selectedCompanyDetail?.createdAt ? format(new Date(selectedCompanyDetail.createdAt), 'PPP') : 'Unknown'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Description */}
+                {selectedCompanyDetail?.description && (
+                  <div className="space-y-2">
+                    <h5 className="text-lg font-semibold text-surface-900 dark:text-white">Description</h5>
+                    <p className="text-surface-700 dark:text-surface-300 bg-surface-50 dark:bg-surface-700/50 p-4 rounded-xl">
+                      {selectedCompanyDetail.description}
+                    </p>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="flex justify-end space-x-3 pt-6 border-t border-surface-200 dark:border-surface-700">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      setShowCompanyDetailModal(false)
+                      setEditingCompany(selectedCompanyDetail)
+                      setShowCompanyModal(true)
+                    }}
+                    className="px-6 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-lg hover:shadow-lg transition-all duration-300 flex items-center space-x-2"
+                  >
+                    <ApperIcon name="Edit" className="w-4 h-4" />
+                    <span>Edit Company</span>
                   </motion.button>
                 </div>
               </div>
