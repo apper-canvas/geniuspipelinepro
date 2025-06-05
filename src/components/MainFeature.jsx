@@ -875,14 +875,20 @@ const handleQuoteClick = (quote) => {
     }
   }
 
-  const handleQuoteDelete = async (quoteId) => {
+const handleQuoteDelete = async (quoteId) => {
     if (!window.confirm('Are you sure you want to delete this quote?')) return
     
     try {
+      setLoading(true)
+      const { quoteService } = await import('../services')
+      await quoteService.delete(quoteId)
       setQuotes(quotes.filter(q => q.id !== quoteId))
-      toast.success('Quote deleted successfully')
+      toast.success('Quote deleted successfully from database')
     } catch (err) {
-      toast.error('Failed to delete quote')
+      console.error('Quote deletion error:', err)
+      toast.error(err?.message || 'Failed to delete quote from database')
+    } finally {
+      setLoading(false)
     }
   }
 
