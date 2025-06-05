@@ -1,51 +1,147 @@
-import emailData from '../mockData/emails.json'
-
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms))
-
-let emails = [...emailData]
-
 const emailService = {
   async getAll() {
-    await delay(300)
-    return [...emails]
+    try {
+      const { ApperClient } = window.ApperSDK
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      })
+
+      const params = {
+        fields: ['Name', 'Tags', 'Owner', 'CreatedOn', 'CreatedBy', 'ModifiedOn', 'ModifiedBy', 'to', 'from', 'subject', 'body', 'timestamp', 'status', 'is_read', 'reply_to'],
+        orderBy: [{ fieldName: 'timestamp', SortType: 'DESC' }],
+        pagingInfo: { limit: 100, offset: 0 }
+      }
+
+      const response = await apperClient.fetchRecords('email', params)
+      return response?.data || []
+    } catch (error) {
+      console.error('Error fetching emails:', error)
+      throw new Error('Failed to fetch emails')
+    }
   },
 
   async getById(id) {
-    await delay(200)
-    const email = emails.find(e => e.id === id)
-    return email ? { ...email } : null
+    try {
+      const { ApperClient } = window.ApperSDK
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      })
+
+      const params = {
+        fields: ['Name', 'Tags', 'Owner', 'CreatedOn', 'CreatedBy', 'ModifiedOn', 'ModifiedBy', 'to', 'from', 'subject', 'body', 'timestamp', 'status', 'is_read', 'reply_to']
+      }
+
+      const response = await apperClient.getRecordById('email', id, params)
+      return response?.data || null
+    } catch (error) {
+      console.error('Error fetching email:', error)
+      throw new Error('Failed to fetch email')
+    }
   },
 
   async create(data) {
-    await delay(400)
-    const newEmail = {
-      ...data,
-      id: Date.now().toString(),
-      timestamp: new Date().toISOString()
+    try {
+      const { ApperClient } = window.ApperSDK
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      })
+
+      // Only include Updateable fields
+      const emailData = {
+        to: data.to || '',
+        from: data.from || '',
+        subject: data.subject || '',
+        body: data.body || '',
+        timestamp: data.timestamp || new Date().toISOString(),
+        status: data.status || 'sent',
+        is_read: data.isRead || false,
+        reply_to: data.replyTo || null
+      }
+
+      const params = {
+        records: [emailData]
+      }
+
+      const response = await apperClient.createRecord('email', params)
+      
+      if (response?.success && response.results?.[0]?.success) {
+        return response.results[0].data
+      } else {
+        const errorMsg = response.results?.[0]?.message || 'Failed to create email'
+        throw new Error(errorMsg)
+      }
+    } catch (error) {
+      console.error('Error creating email:', error)
+      throw new Error(error.message || 'Failed to create email')
     }
-    emails.push(newEmail)
-    return { ...newEmail }
   },
 
   async update(id, data) {
-    await delay(350)
-    const index = emails.findIndex(e => e.id === id)
-    if (index === -1) throw new Error('Email not found')
-    
-    emails[index] = {
-      ...emails[index],
-      ...data
+    try {
+      const { ApperClient } = window.ApperSDK
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      })
+
+      // Only include Updateable fields plus ID
+      const emailData = {
+        Id: id,
+        to: data.to || '',
+        from: data.from || '',
+        subject: data.subject || '',
+        body: data.body || '',
+        timestamp: data.timestamp || new Date().toISOString(),
+        status: data.status || 'sent',
+        is_read: data.isRead !== undefined ? data.isRead : false,
+        reply_to: data.replyTo || data.reply_to || null
+      }
+
+      const params = {
+        records: [emailData]
+      }
+
+      const response = await apperClient.updateRecord('email', params)
+      
+      if (response?.success && response.results?.[0]?.success) {
+        return response.results[0].data
+      } else {
+        const errorMsg = response.results?.[0]?.message || 'Failed to update email'
+        throw new Error(errorMsg)
+      }
+    } catch (error) {
+      console.error('Error updating email:', error)
+      throw new Error(error.message || 'Failed to update email')
     }
-    return { ...emails[index] }
   },
 
   async delete(id) {
-    await delay(250)
-    const index = emails.findIndex(e => e.id === id)
-    if (index === -1) throw new Error('Email not found')
-    
-    emails.splice(index, 1)
-    return true
+    try {
+      const { ApperClient } = window.ApperSDK
+      const apperClient = new ApperClient({
+        apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+        apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+      })
+
+      const params = {
+        RecordIds: [id]
+      }
+
+      const response = await apperClient.deleteRecord('email', params)
+      
+      if (response?.success && response.results?.[0]?.success) {
+        return true
+      } else {
+        const errorMsg = response.results?.[0]?.message || 'Failed to delete email'
+        throw new Error(errorMsg)
+      }
+    } catch (error) {
+      console.error('Error deleting email:', error)
+      throw new Error(error.message || 'Failed to delete email')
+    }
   }
 }
 
