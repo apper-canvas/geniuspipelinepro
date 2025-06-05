@@ -30,6 +30,17 @@ export default {
           800: '#1e293b',
           900: '#0f172a'
         }
+},
+        buttonText: {
+          light: '#ffffff',
+          dark: '#000000',
+          primary: '#ffffff',
+          secondary: '#ffffff',
+          contrast: {
+            light: '#1e293b',
+            dark: '#f8fafc'
+          }
+        }
       },
       fontFamily: {
         sans: ['Inter', 'ui-sans-serif', 'system-ui'],
@@ -44,7 +55,6 @@ export default {
       borderRadius: {
         'xl': '0.75rem',
         '2xl': '1rem'
-      }
     }
   },
   plugins: [],

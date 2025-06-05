@@ -26,11 +26,7 @@
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
 -moz-osx-font-smoothing: grayscale;
-  }
-  
-  button {
-    @apply text-black;
-  }
+}
   
   .container {
     @apply mx-auto px-4 sm:px-6 lg:px-8;
