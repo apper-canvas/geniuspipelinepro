@@ -1495,7 +1495,7 @@ const handleConvertQuoteToDeal = async (quote) => {
                         value={salesOrderFormData.contactId}
                         onChange={(e) => setSalesOrderFormData({ ...salesOrderFormData, contactId: e.target.value })}
                         className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      >
+>
                         <option value="">Select contact</option>
                         {contacts.map((contact) => (
                           <option key={contact.id} value={contact.email}>
@@ -1512,7 +1512,7 @@ const handleConvertQuoteToDeal = async (quote) => {
                         value={salesOrderFormData.companyId}
                         onChange={(e) => setSalesOrderFormData({ ...salesOrderFormData, companyId: e.target.value })}
                         className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      >
+>
                         <option value="">Select company</option>
                         {companies.map((company) => (
                           <option key={company.id} value={company.name}>
@@ -1795,7 +1795,7 @@ const handleConvertQuoteToDeal = async (quote) => {
                         value={quoteFormData.contactId}
                         onChange={(e) => setQuoteFormData({ ...quoteFormData, contactId: e.target.value })}
                         className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      >
+>
                         <option value="">Select contact</option>
                         {contacts.map((contact) => (
                           <option key={contact.id} value={contact.email}>
@@ -1812,7 +1812,7 @@ const handleConvertQuoteToDeal = async (quote) => {
                         value={quoteFormData.companyId}
                         onChange={(e) => setQuoteFormData({ ...quoteFormData, companyId: e.target.value })}
                         className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      >
+>
                         <option value="">Select company</option>
                         {companies.map((company) => (
                           <option key={company.id} value={company.name}>
@@ -2038,7 +2038,7 @@ const handleConvertQuoteToDeal = async (quote) => {
                         value={salesOrderFormData.contactId}
                         onChange={(e) => setSalesOrderFormData({ ...salesOrderFormData, contactId: e.target.value })}
                         className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      >
+>
                         <option value="">Select contact</option>
                         {contacts.map((contact) => (
                           <option key={contact.id} value={contact.email}>
@@ -2055,7 +2055,7 @@ const handleConvertQuoteToDeal = async (quote) => {
                         value={salesOrderFormData.companyId}
                         onChange={(e) => setSalesOrderFormData({ ...salesOrderFormData, companyId: e.target.value })}
                         className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      >
+>
                         <option value="">Select company</option>
                         {companies.map((company) => (
                           <option key={company.id} value={company.name}>
@@ -2695,7 +2695,7 @@ Company
                     value={formData.company}
                     onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                     className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-                  >
+>
                     <option value="">Select company</option>
                     {companies.map((company) => (
                       <option key={company.id} value={company.name}>
@@ -3275,7 +3275,7 @@ required
                       value={dealFormData.contactId}
                       onChange={(e) => setDealFormData({ ...dealFormData, contactId: e.target.value })}
                       className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-                    >
+>
                       <option value="">Select contact</option>
                       {contacts.map((contact) => (
                         <option key={contact.id} value={contact.email}>
@@ -3292,7 +3292,7 @@ required
                       value={dealFormData.companyId}
                       onChange={(e) => setDealFormData({ ...dealFormData, companyId: e.target.value })}
                       className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-                    >
+>
                       <option value="">Select company</option>
                       {companies.map((company) => (
                         <option key={company.id} value={company.name}>
