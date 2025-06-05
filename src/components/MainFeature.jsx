@@ -271,11 +271,7 @@ const loadQuotes = async () => {
       setLoading(false)
     }
   }
-
-  useEffect(() => {
-    loadData()
-  }, [activeSection])
-
+}
 const loadData = async () => {
     setLoading(true)
     setError(null)
@@ -1738,10 +1734,10 @@ if (activeSection === 'dashboard') {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+<label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                         Contact
                       </label>
                       <select
-<select
                         value={salesOrderFormData.contactId}
                         onChange={(e) => setSalesOrderFormData({ ...salesOrderFormData, contactId: e.target.value })}
                         className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -1753,7 +1749,7 @@ if (activeSection === 'dashboard') {
                           </option>
                         ))}
                       </select>
-</div>
+                    </div>
                     <div>
                       <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                         Company
@@ -2038,11 +2034,10 @@ if (activeSection === 'dashboard') {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+<label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                         Contact
                       </label>
                       <select
-<select
                         value={quoteFormData.contactId}
                         onChange={(e) => setQuoteFormData({ ...quoteFormData, contactId: e.target.value })}
                         className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -2054,7 +2049,8 @@ if (activeSection === 'dashboard') {
                           </option>
                         ))}
                       </select>
-</div>
+                    </div>
+                    <div>
                     <div>
                       <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                         Company
@@ -2282,11 +2278,10 @@ if (activeSection === 'dashboard') {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+<label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                         Contact
                       </label>
                       <select
-<select
                         value={salesOrderFormData.contactId}
                         onChange={(e) => setSalesOrderFormData({ ...salesOrderFormData, contactId: e.target.value })}
                         className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
@@ -2298,7 +2293,8 @@ if (activeSection === 'dashboard') {
                           </option>
                         ))}
                       </select>
-</div>
+                    </div>
+                    <div>
                     <div>
                       <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                         Company
@@ -2941,22 +2937,21 @@ onClick={() => {
 
                 <div>
                   <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
-                    Company
+Company
                   </label>
                   <select
-<select
-                      value={formData.company}
-                      onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                      className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-                    >
-                      <option value="">Select company</option>
-                      {companies.map((company) => (
-                        <option key={company.id} value={company.name}>
-                          {company.name}
-                        </option>
-                      ))}
-                    </select>
-</div>
+                    value={formData.company}
+                    onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                    className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                  >
+                    <option value="">Select company</option>
+                    {companies.map((company) => (
+                      <option key={company.id} value={company.name}>
+                        {company.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
                 <div>
                   <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
@@ -3523,9 +3518,8 @@ required
                   <div>
                     <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
                       Contact
-                    </label>
+</label>
                     <select
-<select
                       value={dealFormData.contactId}
                       onChange={(e) => setDealFormData({ ...dealFormData, contactId: e.target.value })}
                       className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
@@ -3537,7 +3531,7 @@ required
                         </option>
                       ))}
                     </select>
-</div>
+                  </div>
                   <div>
                     <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
                       Company
