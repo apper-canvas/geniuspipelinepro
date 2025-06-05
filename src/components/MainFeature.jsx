@@ -837,7 +837,7 @@ const handleQuoteClick = (quote) => {
     }
   }
 
-  const handleSalesOrderSubmit = async (e) => {
+const handleSalesOrderSubmit = async (e) => {
     e.preventDefault()
     if (!salesOrderFormData.title?.trim() || !salesOrderFormData.amount) {
       toast.error('Please fill in title and amount fields')
@@ -846,20 +846,21 @@ const handleQuoteClick = (quote) => {
 
     try {
       setLoading(true)
-      const orderData = {
-        ...salesOrderFormData,
-        amount: parseFloat(salesOrderFormData.amount),
-        id: editingSalesOrder ? editingSalesOrder.id : Date.now(),
-        orderNumber: editingSalesOrder ? editingSalesOrder.orderNumber : `SO-2024-${String(salesOrders.length + 1).padStart(3, '0')}`,
-        createdAt: editingSalesOrder ? editingSalesOrder.createdAt : new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }
+      const { salesOrderService } = await import('../services')
       
       if (editingSalesOrder) {
-        setSalesOrders(salesOrders.map(so => so.id === editingSalesOrder.id ? orderData : so))
+        const orderData = {
+          ...salesOrderFormData,
+          amount: parseFloat(salesOrderFormData.amount)
+        }
+        await salesOrderService.update(editingSalesOrder.id, orderData)
         toast.success('Sales order updated successfully')
       } else {
-        setSalesOrders([...salesOrders, orderData])
+        const orderData = {
+          ...salesOrderFormData,
+          amount: parseFloat(salesOrderFormData.amount)
+        }
+        await salesOrderService.create(orderData)
         toast.success('Sales order created successfully')
       }
       
@@ -876,7 +877,9 @@ const handleQuoteClick = (quote) => {
         items: []
       })
       setEditingSalesOrder(null)
+      loadSalesOrders() // Reload sales orders from service
     } catch (err) {
+      console.error('Sales order submission error:', err)
       toast.error(err?.message || 'Failed to save sales order')
     } finally {
       setLoading(false)
