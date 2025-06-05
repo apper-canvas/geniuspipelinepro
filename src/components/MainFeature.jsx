@@ -3108,19 +3108,20 @@ onClick={() => {
                     </label>
                     <select
                       value={dealFormData.companyId}
+value={dealFormData.companyId}
                       onChange={(e) => setDealFormData({ ...dealFormData, companyId: e.target.value })}
                       className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
 >
                       <option value="">Select company</option>
                       {companies.map((company) => (
                         <option key={company.id} value={company.name}>
                           {company.name}
                         </option>
-                      ))}
+))}
                     </select>
                   </div>
                 </div>
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
@@ -3181,13 +3182,12 @@ className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 ro
                   >
                     {loading ? 'Creating...' : 'Create Deal'}
                   </button>
-                </div>
+</div>
               </form>
             </motion.div>
           </motion.div>
-)}
+        )}
       </AnimatePresence>
-
       {/* Contact Detail Modal */}
       <AnimatePresence>
         {showContactDetailModal && selectedContactDetail && (

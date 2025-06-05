@@ -87,7 +87,7 @@ async create(data) {
 
       console.log('Creating deal with data:', dealData)
 
-      const params = {
+const params = {
         records: [dealData]
       }
 
