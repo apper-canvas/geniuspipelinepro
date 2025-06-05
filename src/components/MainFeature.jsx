@@ -1741,10 +1741,11 @@ if (activeSection === 'dashboard') {
                         Contact
                       </label>
                       <select
+<select
                         value={salesOrderFormData.contactId}
                         onChange={(e) => setSalesOrderFormData({ ...salesOrderFormData, contactId: e.target.value })}
                         className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
->
+                      >
                         <option value="">Select contact</option>
                         {contacts.map((contact) => (
                           <option key={contact.id} value={contact.email}>
@@ -1752,7 +1753,7 @@ if (activeSection === 'dashboard') {
                           </option>
                         ))}
                       </select>
-                    </div>
+</div>
                     <div>
                       <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                         Company
@@ -1761,7 +1762,7 @@ if (activeSection === 'dashboard') {
                         value={salesOrderFormData.companyId}
                         onChange={(e) => setSalesOrderFormData({ ...salesOrderFormData, companyId: e.target.value })}
                         className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
->
+                      >
                         <option value="">Select company</option>
                         {companies.map((company) => (
                           <option key={company.id} value={company.name}>
@@ -2041,10 +2042,11 @@ if (activeSection === 'dashboard') {
                         Contact
                       </label>
                       <select
+<select
                         value={quoteFormData.contactId}
                         onChange={(e) => setQuoteFormData({ ...quoteFormData, contactId: e.target.value })}
                         className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
->
+                      >
                         <option value="">Select contact</option>
                         {contacts.map((contact) => (
                           <option key={contact.id} value={contact.email}>
@@ -2052,7 +2054,7 @@ if (activeSection === 'dashboard') {
                           </option>
                         ))}
                       </select>
-                    </div>
+</div>
                     <div>
                       <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                         Company
@@ -2061,7 +2063,7 @@ if (activeSection === 'dashboard') {
                         value={quoteFormData.companyId}
                         onChange={(e) => setQuoteFormData({ ...quoteFormData, companyId: e.target.value })}
                         className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
->
+                      >
                         <option value="">Select company</option>
                         {companies.map((company) => (
                           <option key={company.id} value={company.name}>
@@ -2072,7 +2074,7 @@ if (activeSection === 'dashboard') {
                     </div>
                   </div>
 
-                  <div>
+<div>
                     <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                       Valid Until
                     </label>
@@ -2080,19 +2082,6 @@ if (activeSection === 'dashboard') {
                       type="date"
                       value={quoteFormData.validUntil}
                       onChange={(e) => setQuoteFormData({ ...quoteFormData, validUntil: e.target.value })}
-                      className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
-/>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
-                      Valid Until
-                    </label>
-                    <input
-                      type="date"
-                      value={quoteFormData.validUntil}
-                      onChange={(e) => setQuoteFormData({ ...quoteFormData, validUntil: e.target.value })}
-onChange={(e) => setQuoteFormData({ ...quoteFormData, validUntil: e.target.value })}
                       className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
                     />
                   </div>
@@ -2297,10 +2286,11 @@ onChange={(e) => setQuoteFormData({ ...quoteFormData, validUntil: e.target.value
                         Contact
                       </label>
                       <select
+<select
                         value={salesOrderFormData.contactId}
                         onChange={(e) => setSalesOrderFormData({ ...salesOrderFormData, contactId: e.target.value })}
                         className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
->
+                      >
                         <option value="">Select contact</option>
                         {contacts.map((contact) => (
                           <option key={contact.id} value={contact.email}>
@@ -2308,7 +2298,7 @@ onChange={(e) => setQuoteFormData({ ...quoteFormData, validUntil: e.target.value
                           </option>
                         ))}
                       </select>
-                    </div>
+</div>
                     <div>
                       <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                         Company
@@ -2317,7 +2307,7 @@ onChange={(e) => setQuoteFormData({ ...quoteFormData, validUntil: e.target.value
                         value={salesOrderFormData.companyId}
                         onChange={(e) => setSalesOrderFormData({ ...salesOrderFormData, companyId: e.target.value })}
                         className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
->
+                      >
                         <option value="">Select company</option>
                         {companies.map((company) => (
                           <option key={company.id} value={company.name}>
@@ -2332,10 +2322,10 @@ onChange={(e) => setQuoteFormData({ ...quoteFormData, validUntil: e.target.value
                     <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                       Expected Delivery
                     </label>
-                    <input
+<input
                       type="date"
                       value={salesOrderFormData.expectedDelivery}
-onChange={(e) => setSalesOrderFormData({ ...salesOrderFormData, expectedDelivery: e.target.value })}
+                      onChange={(e) => setSalesOrderFormData({ ...salesOrderFormData, expectedDelivery: e.target.value })}
                       className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
                     />
                   </div>
@@ -2954,18 +2944,20 @@ onClick={() => {
                     Company
                   </label>
                   <select
-                    value={formData.company}
-                    onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                    className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
->
-                    <option value="">Select company</option>
-                    {companies.map((company) => (
-                      <option key={company.id} value={company.name}>
-                        {company.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+<select
+                      value={formData.company}
+                      onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                      className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                    >
+                      <option value="">Select company</option>
+                      {companies.map((company) => (
+                        <option key={company.id} value={company.name}>
+                          {company.name}
+                        </option>
+                      ))}
+                    </select>
+</div>
+
                 <div>
                   <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
                     Position
@@ -2977,7 +2969,6 @@ onClick={() => {
                     className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
                   />
                 </div>
-
                 <div className="flex justify-end space-x-3 pt-4">
                   <button
                     type="button"
@@ -3534,10 +3525,11 @@ required
                       Contact
                     </label>
                     <select
+<select
                       value={dealFormData.contactId}
                       onChange={(e) => setDealFormData({ ...dealFormData, contactId: e.target.value })}
                       className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
->
+                    >
                       <option value="">Select contact</option>
                       {contacts.map((contact) => (
                         <option key={contact.id} value={contact.email}>
@@ -3545,7 +3537,7 @@ required
                         </option>
                       ))}
                     </select>
-                  </div>
+</div>
                   <div>
                     <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
                       Company
@@ -3554,7 +3546,7 @@ required
                       value={dealFormData.companyId}
                       onChange={(e) => setDealFormData({ ...dealFormData, companyId: e.target.value })}
                       className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
->
+                    >
                       <option value="">Select company</option>
                       {companies.map((company) => (
                         <option key={company.id} value={company.name}>
