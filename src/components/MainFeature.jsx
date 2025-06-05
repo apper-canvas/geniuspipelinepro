@@ -258,7 +258,7 @@ const loadQuotes = async () => {
     }
   }
 
-  const loadSalesOrders = async () => {
+const loadSalesOrders = async () => {
     try {
       setLoading(true)
       const { salesOrderService } = await import('../services')
@@ -271,9 +271,9 @@ const loadQuotes = async () => {
       setLoading(false)
     }
   }
-}
+
 const loadData = async () => {
-    setLoading(true)
+  setLoading(true)
     setError(null)
     try {
       if (activeSection === 'contacts') {
@@ -899,7 +899,7 @@ const handleQuoteDelete = async (quoteId) => {
     }
   }
 
-  const handleConvertQuoteToDeal = async (quote) => {
+const handleConvertQuoteToDeal = async (quote) => {
     try {
       const dealData = {
         id: Date.now(),
@@ -920,10 +920,9 @@ const handleQuoteDelete = async (quoteId) => {
     }
   }
 
-if (activeSection === 'dashboard') {
+  if (activeSection === 'dashboard') {
     return <Dashboard />
   }
-  
   if (activeSection === 'companies') {
     return (
         <div className="p-6">
@@ -1312,256 +1311,6 @@ if (activeSection === 'dashboard') {
 </div>
       )
     }
-    if (activeSection === 'quotes') {
-      return (
-        <div className="p-6">
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-            <div>
-              <h1 className="text-3xl font-bold text-surface-900 dark:text-white">Quotes</h1>
-              <p className="text-surface-600 dark:text-surface-400 mt-1">Manage your quote proposals</p>
-            </div>
-            <motion.button
-              onClick={() => {
-                setEditingQuote(null)
-                setQuoteFormData({
-                  title: '',
-                  description: '',
-                  amount: '',
-                  contactId: '',
-                  companyId: '',
-                  status: 'draft',
-                  validUntil: '',
-                  items: []
-                })
-                setShowQuoteModal(true)
-              }}
-              className="mt-4 sm:mt-0 flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-primary to-secondary text-white rounded-xl hover:shadow-lg transition-all"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <ApperIcon name="Plus" className="w-4 h-4" />
-              <span>New Quote</span>
-            </motion.button>
-          </div>
-
-          {/* Search and Filters */}
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            <div className="flex-1 relative">
-              <ApperIcon name="Search" className="absolute left-3 top-1/2 transform -translate-y-1/2 text-surface-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search quotes..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
-              />
-            </div>
-            <select
-              value={selectedFilter}
-              onChange={(e) => setSelectedFilter(e.target.value)}
-              className="px-4 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
-            >
-              <option value="all">All Status</option>
-              <option value="draft">Draft</option>
-              <option value="sent">Sent</option>
-              <option value="accepted">Accepted</option>
-              <option value="rejected">Rejected</option>
-            </select>
-          </div>
-
-          {/* Quotes Grid */}
-          {loading ? (
-            <div className="flex items-center justify-center h-64">
-              <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {quotes.map((quote) => (
-                <motion.div
-                  key={quote.id}
-                  className="bg-white dark:bg-surface-800 p-6 rounded-2xl shadow-card border border-surface-200 dark:border-surface-700 cursor-pointer"
-                  whileHover={{ scale: 1.02 }}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  onClick={() => handleQuoteClick(quote)}
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-surface-900 dark:text-white">{quote.title}</h3>
-                      <p className="text-surface-600 dark:text-surface-400 text-sm">{quote.description}</p>
-                    </div>
-                    <span className={`px-2 py-1 rounded-lg text-xs font-medium ${
-                      quote.status === 'draft' ? 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300' :
-                      quote.status === 'sent' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300' :
-                      quote.status === 'accepted' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
-                      'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
-                    }`}>
-                      {quote.status}
-                    </span>
-                  </div>
-                  
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-2xl font-bold text-primary">${quote.amount?.toLocaleString()}</span>
-                    </div>
-                    <div className="flex items-center space-x-2 text-sm text-surface-600 dark:text-surface-400">
-                      <ApperIcon name="User" className="w-4 h-4" />
-                      <span>{quote.contactId}</span>
-                    </div>
-                    <div className="flex items-center space-x-2 text-sm text-surface-600 dark:text-surface-400">
-                      <ApperIcon name="Building2" className="w-4 h-4" />
-                      <span>{quote.companyId}</span>
-                    </div>
-                    <div className="flex items-center space-x-2 text-sm text-surface-600 dark:text-surface-400">
-                      <ApperIcon name="Calendar" className="w-4 h-4" />
-                      <span>Valid until: {quote.validUntil ? format(new Date(quote.validUntil), 'MMM dd, yyyy') : 'No expiry'}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setEditingQuote(quote)
-                        setQuoteFormData({
-                          title: quote.title,
-                          description: quote.description,
-                          amount: quote.amount.toString(),
-                          contactId: quote.contactId,
-                          companyId: quote.companyId,
-                          status: quote.status,
-                          validUntil: quote.validUntil,
-                          items: quote.items || []
-                        })
-                        setShowQuoteModal(true)
-                      }}
-                      className="flex-1 flex items-center justify-center space-x-1 px-3 py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
-                    >
-                      <ApperIcon name="Edit" className="w-4 h-4" />
-                      <span className="text-sm">Edit</span>
-                    </button>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleQuoteDelete(quote.id)
-                      }}
-                      className="flex-1 flex items-center justify-center space-x-1 px-3 py-2 bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 rounded-lg hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
-                    >
-                      <ApperIcon name="Trash2" className="w-4 h-4" />
-                      <span className="text-sm">Delete</span>
-                    </button>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          )}
-
-          {/* Quote Modal */}
-          {showQuoteModal && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-              <motion.div
-                className="bg-white dark:bg-surface-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-              >
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-surface-900 dark:text-white">
-                    {editingQuote ? 'Edit Quote' : 'Create New Quote'}
-                  </h2>
-                  <button
-                    onClick={() => {
-                      setShowQuoteModal(false)
-                      setEditingQuote(null)
-                    }}
-                    className="p-2 hover:bg-surface-100 dark:hover:bg-surface-700 rounded-xl transition-colors"
-                  >
-                    <ApperIcon name="X" className="w-5 h-5 text-surface-500" />
-                  </button>
-                </div>
-
-                <form onSubmit={handleQuoteSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
-                      Quote Title *
-                    </label>
-                    <input
-                      type="text"
-                      value={quoteFormData.title}
-                      onChange={(e) => setQuoteFormData({ ...quoteFormData, title: e.target.value })}
-                      required
-                      className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
-                      Description
-                    </label>
-                    <textarea
-                      value={quoteFormData.description}
-                      onChange={(e) => setQuoteFormData({ ...quoteFormData, description: e.target.value })}
-                      rows="3"
-                      className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
-                        Amount *
-                      </label>
-                      <input
-                        type="number"
-                        value={quoteFormData.amount}
-                        onChange={(e) => setQuoteFormData({ ...quoteFormData, amount: e.target.value })}
-                        required
-                        step="0.01"
-                        className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
-                        Status
-                      </label>
-                      <select
-                        value={quoteFormData.status}
-                        onChange={(e) => setQuoteFormData({ ...quoteFormData, status: e.target.value })}
-                        className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      >
-                        <option value="draft">Draft</option>
-                        <option value="sent">Sent</option>
-                        <option value="accepted">Accepted</option>
-                        <option value="rejected">Rejected</option>
-                      </select>
-</div>
-                  </div>
-
-                  <div className="flex space-x-3 pt-4">
-                    <button
-                      type="submit"
-                      className="flex-1 bg-gradient-to-r from-primary to-secondary text-white py-2 px-4 rounded-xl hover:shadow-lg transition-all"
-                    >
-                      {editingQuote ? 'Update Quote' : 'Create Quote'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowQuoteModal(false)
-                        setEditingQuote(null)
-                      }}
-                      className="flex-1 bg-surface-200 dark:bg-surface-700 text-surface-700 dark:text-surface-300 py-2 px-4 rounded-xl hover:bg-surface-300 dark:hover:bg-surface-600 transition-colors"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </form>
-              </motion.div>
-            </div>
-          )}
-        </div>
-      )
-    }
 
     if (activeSection === 'salesorders') {
       return (
@@ -1732,9 +1481,8 @@ if (activeSection === 'dashboard') {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
+<div>
                       <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
-<label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                         Contact
                       </label>
                       <select
@@ -2032,9 +1780,9 @@ if (activeSection === 'dashboard') {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-<label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                         Contact
                       </label>
                       <select
@@ -2049,8 +1797,7 @@ if (activeSection === 'dashboard') {
                           </option>
                         ))}
                       </select>
-                    </div>
-                    <div>
+</div>
                     <div>
                       <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                         Company
@@ -2067,10 +1814,10 @@ if (activeSection === 'dashboard') {
                           </option>
                         ))}
                       </select>
-                    </div>
+</div>
                   </div>
 
-<div>
+                  <div>
                     <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                       Valid Until
                     </label>
@@ -2270,15 +2017,15 @@ if (activeSection === 'dashboard') {
                         <option value="confirmed">Confirmed</option>
                         <option value="processing">Processing</option>
                         <option value="shipped">Shipped</option>
-                        <option value="delivered">Delivered</option>
+<option value="delivered">Delivered</option>
                         <option value="cancelled">Cancelled</option>
-</select>
+                      </select>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-<label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                         Contact
                       </label>
                       <select
@@ -2293,8 +2040,7 @@ if (activeSection === 'dashboard') {
                           </option>
                         ))}
                       </select>
-                    </div>
-                    <div>
+</div>
                     <div>
                       <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                         Company
@@ -2315,10 +2061,10 @@ if (activeSection === 'dashboard') {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+<label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
                       Expected Delivery
                     </label>
-<input
+                    <input
                       type="date"
                       value={salesOrderFormData.expectedDelivery}
                       onChange={(e) => setSalesOrderFormData({ ...salesOrderFormData, expectedDelivery: e.target.value })}
