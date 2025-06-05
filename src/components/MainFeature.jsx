@@ -1744,7 +1744,7 @@ if (activeSection === 'dashboard') {
                         value={salesOrderFormData.contactId}
                         onChange={(e) => setSalesOrderFormData({ ...salesOrderFormData, contactId: e.target.value })}
                         className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      >
+>
                         <option value="">Select contact</option>
                         {contacts.map((contact) => (
                           <option key={contact.id} value={contact.email}>
@@ -1761,7 +1761,7 @@ if (activeSection === 'dashboard') {
                         value={salesOrderFormData.companyId}
                         onChange={(e) => setSalesOrderFormData({ ...salesOrderFormData, companyId: e.target.value })}
                         className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      >
+>
                         <option value="">Select company</option>
                         {companies.map((company) => (
                           <option key={company.id} value={company.name}>
@@ -2044,7 +2044,7 @@ if (activeSection === 'dashboard') {
                         value={quoteFormData.contactId}
                         onChange={(e) => setQuoteFormData({ ...quoteFormData, contactId: e.target.value })}
                         className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      >
+>
                         <option value="">Select contact</option>
                         {contacts.map((contact) => (
                           <option key={contact.id} value={contact.email}>
@@ -2061,7 +2061,7 @@ if (activeSection === 'dashboard') {
                         value={quoteFormData.companyId}
                         onChange={(e) => setQuoteFormData({ ...quoteFormData, companyId: e.target.value })}
                         className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      >
+>
                         <option value="">Select company</option>
                         {companies.map((company) => (
                           <option key={company.id} value={company.name}>
@@ -2300,7 +2300,7 @@ onChange={(e) => setQuoteFormData({ ...quoteFormData, validUntil: e.target.value
                         value={salesOrderFormData.contactId}
                         onChange={(e) => setSalesOrderFormData({ ...salesOrderFormData, contactId: e.target.value })}
                         className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      >
+>
                         <option value="">Select contact</option>
                         {contacts.map((contact) => (
                           <option key={contact.id} value={contact.email}>
@@ -2317,7 +2317,7 @@ onChange={(e) => setQuoteFormData({ ...quoteFormData, validUntil: e.target.value
                         value={salesOrderFormData.companyId}
                         onChange={(e) => setSalesOrderFormData({ ...salesOrderFormData, companyId: e.target.value })}
                         className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
-                      >
+>
                         <option value="">Select company</option>
                         {companies.map((company) => (
                           <option key={company.id} value={company.name}>
@@ -2957,7 +2957,7 @@ onClick={() => {
                     value={formData.company}
                     onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                     className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-                  >
+>
                     <option value="">Select company</option>
                     {companies.map((company) => (
                       <option key={company.id} value={company.name}>
@@ -3537,7 +3537,7 @@ required
                       value={dealFormData.contactId}
                       onChange={(e) => setDealFormData({ ...dealFormData, contactId: e.target.value })}
                       className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-                    >
+>
                       <option value="">Select contact</option>
                       {contacts.map((contact) => (
                         <option key={contact.id} value={contact.email}>
@@ -3554,7 +3554,7 @@ required
                       value={dealFormData.companyId}
                       onChange={(e) => setDealFormData({ ...dealFormData, companyId: e.target.value })}
                       className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-lg bg-white dark:bg-surface-700 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-                    >
+>
                       <option value="">Select company</option>
                       {companies.map((company) => (
                         <option key={company.id} value={company.name}>
@@ -4911,7 +4911,7 @@ const [suggestions, setSuggestions] = useState([])
           placeholder="Write your note here... Use @username to tag team members"
         />
         
-        {showSuggestions && (
+{showSuggestions && (
           <div className="absolute z-10 mt-1 w-full max-w-xs bg-white dark:bg-surface-800 border border-surface-300 dark:border-surface-600 rounded-lg shadow-lg">
             {suggestions.map((member, index) => (
               <div
