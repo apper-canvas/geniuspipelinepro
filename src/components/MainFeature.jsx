@@ -888,14 +888,20 @@ const handleQuoteDelete = async (quoteId) => {
     }
   }
 
-  const handleSalesOrderDelete = async (orderId) => {
+const handleSalesOrderDelete = async (orderId) => {
     if (!window.confirm('Are you sure you want to delete this sales order?')) return
     
     try {
-      setSalesOrders(salesOrders.filter(so => so.id !== orderId))
+      setLoading(true)
+      const { salesOrderService } = await import('../services')
+      await salesOrderService.delete(orderId)
       toast.success('Sales order deleted successfully')
+      loadSalesOrders() // Reload sales orders from service
     } catch (err) {
-      toast.error('Failed to delete sales order')
+      console.error('Sales order deletion error:', err)
+      toast.error(err?.message || 'Failed to delete sales order')
+    } finally {
+      setLoading(false)
     }
   }
 
