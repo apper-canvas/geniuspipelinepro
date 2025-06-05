@@ -1047,13 +1047,12 @@ if (activeSection === 'dashboard') {
                     <div className="flex items-center space-x-2 text-sm text-surface-600 dark:text-surface-400">
                       <ApperIcon name="Globe" className="w-4 h-4" />
                       <span className="truncate">{company.website}</span>
-                    </div>
+</div>
                     <div className="flex items-center space-x-2 text-sm text-surface-600 dark:text-surface-400">
                       <ApperIcon name="MapPin" className="w-4 h-4" />
-                      <span>{company.address.city}, {company.address.state}</span>
+                      <span>{company.address?.city && company.address?.state ? `${company.address.city}, ${company.address.state}` : 'Unknown location'}</span>
                     </div>
                   </div>
-
 <div className="flex space-x-2">
                     <button
                       onClick={(e) => {
