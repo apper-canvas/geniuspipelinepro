@@ -693,23 +693,39 @@ toast.success('Deal moved successfully')
     setDraggedDeal(null)
   }
 
-  const handleDealSubmit = async (e) => {
+const handleDealSubmit = async (e) => {
     e.preventDefault()
-    if (!dealFormData.title?.trim() || !dealFormData.value) {
-      toast.error('Please fill in title and value fields')
+    
+    // Enhanced validation
+    if (!dealFormData.title?.trim()) {
+      toast.error('Deal title is required')
+      return
+    }
+    
+    if (!dealFormData.value || isNaN(parseFloat(dealFormData.value)) || parseFloat(dealFormData.value) <= 0) {
+      toast.error('Please enter a valid deal value greater than 0')
       return
     }
 
     try {
       setLoading(true)
+      
+      // Prepare deal data with proper validation
       const dealData = {
-        ...dealFormData,
+        title: dealFormData.title.trim(),
         value: parseFloat(dealFormData.value),
-        probability: parseInt(dealFormData.probability),
+        stage: dealFormData.stage || 'lead',
+        probability: parseInt(dealFormData.probability) || 50,
+        expectedCloseDate: dealFormData.expectedCloseDate || '',
+        contactId: dealFormData.contactId || '',
         createdAt: new Date().toISOString()
       }
       
-      await dealService.create(dealData)
+      console.log('Submitting deal data:', dealData)
+      
+      const result = await dealService.create(dealData)
+      console.log('Deal created successfully:', result)
+      
       toast.success('Deal created successfully')
       setShowDealModal(false)
       setDealFormData({
@@ -722,7 +738,20 @@ toast.success('Deal moved successfully')
       })
       loadData()
     } catch (err) {
-      toast.error(err?.message || 'Failed to create deal')
+      console.error('Error in handleDealSubmit:', err)
+      
+      // Provide more specific error messages
+      if (err.message.includes('title is required')) {
+        toast.error('Deal title is required')
+      } else if (err.message.includes('value is required')) {
+        toast.error('Deal value is required')
+      } else if (err.message.includes('ApperSDK')) {
+        toast.error('Connection error - please refresh the page and try again')
+      } else if (err.message.includes('configuration')) {
+        toast.error('System configuration error - please contact support')
+      } else {
+        toast.error(err?.message || 'Failed to create deal - please try again')
+      }
     } finally {
       setLoading(false)
     }

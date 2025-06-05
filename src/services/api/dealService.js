@@ -41,18 +41,42 @@ const dealService = {
     }
   },
 
-  async create(data) {
+async create(data) {
     try {
+      // Validate required data
+      if (!data || typeof data !== 'object') {
+        throw new Error('Invalid deal data provided')
+      }
+
+      if (!data.title || !data.title.trim()) {
+        throw new Error('Deal title is required')
+      }
+
+      if (!data.value || isNaN(parseFloat(data.value))) {
+        throw new Error('Valid deal value is required')
+      }
+
+      // Check if ApperSDK is available
+      if (!window.ApperSDK || !window.ApperSDK.ApperClient) {
+        throw new Error('ApperSDK is not available. Please check your connection.')
+      }
+
       const { ApperClient } = window.ApperSDK
+      
+      // Validate environment variables
+      if (!import.meta.env.VITE_APPER_PROJECT_ID || !import.meta.env.VITE_APPER_PUBLIC_KEY) {
+        throw new Error('Apper configuration is missing. Please check environment variables.')
+      }
+
       const apperClient = new ApperClient({
         apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
         apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
       })
 
-      // Only include Updateable fields
+      // Validate and prepare deal data
       const dealData = {
-        title: data.title || '',
-        value: parseFloat(data.value) || 0,
+        title: String(data.title).trim(),
+        value: parseFloat(data.value),
         stage: data.stage || 'lead',
         probability: data.probability || '0-6',
         expected_close_date: data.expectedCloseDate || '',
@@ -61,21 +85,32 @@ const dealService = {
         updated_at: new Date().toISOString()
       }
 
+      console.log('Creating deal with data:', dealData)
+
       const params = {
         records: [dealData]
       }
 
       const response = await apperClient.createRecord('deal', params)
       
+      console.log('Deal creation response:', response)
+      
       if (response?.success && response.results?.[0]?.success) {
         return response.results[0].data
       } else {
-        const errorMsg = response.results?.[0]?.message || 'Failed to create deal'
+        const errorMsg = response?.results?.[0]?.message || response?.message || 'Failed to create deal - unknown server error'
+        console.error('Deal creation failed:', errorMsg, response)
         throw new Error(errorMsg)
       }
     } catch (error) {
-      console.error('Error creating deal:', error)
-      throw new Error(error.message || 'Failed to create deal')
+      console.error('Error in deal creation process:', error)
+      
+      // Re-throw with more context if it's a generic error
+      if (error.message === 'Failed to create deal') {
+        throw new Error('Failed to create deal - please check your connection and try again')
+      }
+      
+      throw new Error(error.message || 'Unexpected error occurred while creating deal')
     }
   },
 
