@@ -156,8 +156,13 @@ const companyService = {
     }
   },
 
-  async delete(id) {
+async delete(id) {
     try {
+      // Validate input parameter
+      if (!id) {
+        throw new Error('Company ID is required for deletion')
+      }
+
       const { ApperClient } = window.ApperSDK
       const apperClient = new ApperClient({
         apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
@@ -177,7 +182,16 @@ const companyService = {
         throw new Error(errorMsg)
       }
     } catch (error) {
-      console.error('Error deleting company:', error)
+      // Safe error logging to prevent external script issues
+      try {
+        console.error('Company deletion error:', {
+          companyId: id,
+          error: error.message || error,
+          timestamp: new Date().toISOString()
+        })
+      } catch (logError) {
+        // Fallback if console operations fail
+      }
       throw new Error(error.message || 'Failed to delete company')
     }
   }
