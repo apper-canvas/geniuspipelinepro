@@ -1532,13 +1532,13 @@ if (activeSection === 'dashboard') {
                         <option value="accepted">Accepted</option>
                         <option value="rejected">Rejected</option>
                       </select>
-                    </div>
-                  </div>
 </div>
+                  </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
+                  <div className="flex space-x-3 pt-4">
+                    <button
+                      type="submit"
+                      className="flex-1 bg-gradient-to-r from-primary to-secondary text-white py-2 px-4 rounded-xl hover:shadow-lg transition-all"
                         Contact
                       </label>
                       <select
@@ -1581,10 +1581,11 @@ if (activeSection === 'dashboard') {
                       type="date"
                       value={quoteFormData.validUntil}
                       onChange={(e) => setQuoteFormData({ ...quoteFormData, validUntil: e.target.value })}
-                      className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
                     />
                   </div>
-/>
+
+                  <div className="flex space-x-3 pt-4">
                     <button
                       type="submit"
                       className="flex-1 bg-gradient-to-r from-primary to-secondary text-white py-2 px-4 rounded-xl hover:shadow-lg transition-all"
@@ -1774,10 +1775,9 @@ if (activeSection === 'dashboard') {
                         <option value="shipped">Shipped</option>
                         <option value="delivered">Delivered</option>
                         <option value="cancelled">Cancelled</option>
-                      </select>
+</select>
                     </div>
                   </div>
-</div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -1824,8 +1824,9 @@ if (activeSection === 'dashboard') {
                       type="date"
                       value={salesOrderFormData.expectedDelivery}
                       onChange={(e) => setSalesOrderFormData({ ...salesOrderFormData, expectedDelivery: e.target.value })}
-                      className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+className="w-full px-3 py-2 border border-surface-300 dark:border-surface-600 rounded-xl bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
                     />
+                  </div>
 
                   <div className="flex space-x-3 pt-4">
                     <button
@@ -2437,10 +2438,9 @@ onClick={() => {
                   />
                 </div>
 
-                <div>
+<div>
                   <label className="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-2">
                     Company
-Company
                   </label>
                   <select
                     value={formData.company}
@@ -3013,10 +3013,9 @@ Company
                     placeholder="0"
                     min="0"
                     step="0.01"
-                    required
+required
                   />
                 </div>
-</div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
