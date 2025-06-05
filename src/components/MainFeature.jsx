@@ -244,45 +244,12 @@ const pipelineStages = [
     }
 }
 
-  const loadQuotes = async () => {
+const loadQuotes = async () => {
     try {
       setLoading(true)
-      // Mock quotes data
-      const mockQuotes = [
-        {
-          id: 1,
-          title: 'Website Development Quote',
-          description: 'Complete website redesign and development',
-          amount: 15000,
-          contactId: 'john.doe@company.com',
-          companyId: 'Tech Corp',
-          status: 'sent',
-          validUntil: '2024-02-15',
-          createdAt: '2024-01-15T10:00:00Z',
-          items: [
-            { description: 'UI/UX Design', quantity: 1, unitPrice: 5000, total: 5000 },
-            { description: 'Frontend Development', quantity: 1, unitPrice: 7000, total: 7000 },
-            { description: 'Backend Development', quantity: 1, unitPrice: 3000, total: 3000 }
-          ]
-        },
-        {
-          id: 2,
-          title: 'Marketing Campaign Quote',
-          description: 'Q1 digital marketing campaign',
-          amount: 8500,
-          contactId: 'jane.smith@business.com',
-          companyId: 'Business Solutions Inc',
-          status: 'draft',
-          validUntil: '2024-02-20',
-          createdAt: '2024-01-20T14:30:00Z',
-          items: [
-            { description: 'SEO Optimization', quantity: 1, unitPrice: 3500, total: 3500 },
-            { description: 'Social Media Management', quantity: 3, unitPrice: 1000, total: 3000 },
-            { description: 'Content Creation', quantity: 1, unitPrice: 2000, total: 2000 }
-          ]
-        }
-      ]
-      setQuotes(mockQuotes)
+      const { quoteService } = await import('../services')
+      const data = await quoteService.getAll()
+      setQuotes(data)
     } catch (error) {
       console.error('Error loading quotes:', error)
       toast.error('Failed to load quotes')
@@ -294,43 +261,9 @@ const pipelineStages = [
   const loadSalesOrders = async () => {
     try {
       setLoading(true)
-      // Mock sales orders data
-      const mockSalesOrders = [
-        {
-          id: 1,
-          orderNumber: 'SO-2024-001',
-          title: 'Software License Order',
-          description: 'Annual software licenses for team',
-          amount: 12000,
-          contactId: 'admin@techcorp.com',
-          companyId: 'Tech Corp',
-          status: 'confirmed',
-          expectedDelivery: '2024-02-10',
-          createdAt: '2024-01-10T09:00:00Z',
-          items: [
-            { description: 'Pro License', quantity: 10, unitPrice: 1000, total: 10000 },
-            { description: 'Support Package', quantity: 1, unitPrice: 2000, total: 2000 }
-          ]
-        },
-        {
-          id: 2,
-          orderNumber: 'SO-2024-002',
-          title: 'Hardware Equipment Order',
-          description: 'Office equipment for new team',
-          amount: 25000,
-          contactId: 'procurement@business.com',
-          companyId: 'Business Solutions Inc',
-          status: 'processing',
-          expectedDelivery: '2024-02-25',
-          createdAt: '2024-01-18T11:15:00Z',
-          items: [
-            { description: 'Laptops', quantity: 5, unitPrice: 2000, total: 10000 },
-            { description: 'Monitors', quantity: 10, unitPrice: 500, total: 5000 },
-            { description: 'Accessories', quantity: 1, unitPrice: 10000, total: 10000 }
-          ]
-        }
-      ]
-      setSalesOrders(mockSalesOrders)
+      const { salesOrderService } = await import('../services')
+      const data = await salesOrderService.getAll()
+      setSalesOrders(data)
     } catch (error) {
       console.error('Error loading sales orders:', error)
       toast.error('Failed to load sales orders')
