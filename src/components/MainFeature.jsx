@@ -384,15 +384,27 @@ const loadData = async () => {
     }
   }
 
-  const handleDeleteCompany = async (companyId) => {
+const handleDeleteCompany = async (companyId) => {
     if (window.confirm('Are you sure you want to delete this company?')) {
       try {
+        // Validate company ID before deletion
+        if (!companyId) {
+          console.error('Company deletion failed: No company ID provided')
+          toast.error('Cannot delete company: Invalid company ID')
+          return
+        }
+        
+        console.log('Attempting to delete company with ID:', companyId)
         await companyService.delete(companyId)
         setCompanies(companies.filter(c => c.id !== companyId))
         toast.success('Company deleted successfully!')
       } catch (error) {
-        console.error('Error deleting company:', error)
-        toast.error('Failed to delete company')
+        console.error('Error deleting company:', {
+          companyId: companyId,
+          error: error.message || error,
+          timestamp: new Date().toISOString()
+        })
+        toast.error(`Failed to delete company: ${error.message || 'Unknown error'}`)
       }
     }
   }
