@@ -17,12 +17,13 @@ export default {
           light: '#22D3EE',
           dark: '#0891B2'
         },
-        accent: '#F59E0B',
+accent: '#F59E0B',
         surface: {
           50: '#f8fafc',
           100: '#f1f5f9',
           200: '#e2e8f0',
-400: '#94a3b8',
+          300: '#cbd5e1',
+          400: '#94a3b8',
           500: '#64748b',
           600: '#475569',
           700: '#334155',
